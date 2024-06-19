@@ -425,7 +425,11 @@ function HourlyGraphs(props) {
   // );
   return (
     <div id="hourly-graph">
-      <canvas ref={chartRef} width="800" height="400"></canvas>
+      {screen.width > 768 ? (
+        <canvas ref={chartRef} width="800" height="400"></canvas>
+      ) : (
+        <canvas ref={chartRef} width="400" height="500"></canvas>
+      )}
     </div>
   );
 }

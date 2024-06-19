@@ -220,7 +220,74 @@ i {
 }
 
 @media only screen and (max-width: 768px) {
+  body {
+    margin: 25px;
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+
+  .large-icon {
+    font-size: 90px;
+    margin-block: 0px;
+  }
+
+  .main-num {
+    font-size: 75px;
+    margin-block: 0px;
+  }
+
+  .sub-num {
+    font-size: 20px;
+  }
+
+  #overview-2 p.city-state {
+    font-size: 20px;
+  }
+
+  .temp-small {
+    font-size: 23px;
+    left: -30px;
+  }
+
   #main-sections {
     display: block;
+  }
+
+  #secondary-sections {
+    width: calc(100% - 25px);
+  }
+
+  #week-div {
+    display: block;
+    margin-inline: 0px;
+    width: 100%;
+  }
+  #week-div p {
+    text-align: center;
+  }
+
+  #radar-div {
+    margin-inline: 0px;
+    width: calc(100% - 50px);
+  }
+
+  #radar-div img {
+    width: 100%;
+  }
+
+  #overview-div {
+    width: 100%;
+    margin: 0px;
+  }
+
+  #overview-card {
+    width: calc(100% - 50px);
+  }
+
+  #hourly-graph {
+    margin-inline: 0px;
+    width: calc(100% - 25px);
   }
 }
