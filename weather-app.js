@@ -29,12 +29,7 @@ function Clock(props) {
   );
 }
 
-function Overview(props) {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-
-  const [mainIcon, setMainIcon] = useState("fa-solid fa-cloud");
-
+function iconSelect(iconCode, isExact = true) {
   let iconData = {
     "day-skc": "fa-solid fa-sun",
     "night-skc": "fa-solid fa-moon",
@@ -106,6 +101,31 @@ function Overview(props) {
     "night-fog": "fa-solid fa-smog",
   };
 
+  if (isExact) {
+    if (iconCode in iconData) {
+      return iconData[iconCode];
+    } else {
+      return iconData["day-bkn"];
+    }
+  } else {
+    let iconSplit = iconCode.split("/");
+    let iconId = `${iconSplit[iconSplit.indexOf("day")]}-${
+      iconSplit[iconSplit.indexOf("day") + 1]
+        .split(",")[0]
+        .split("?")[0]
+        .split("&")[0]
+    }`;
+    console.log(iconId);
+    return iconData[iconId];
+  }
+}
+
+function Overview(props) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const [mainIcon, setMainIcon] = useState("fa-solid fa-cloud");
+
   const fetchData = async () => {
     try {
       const response = await fetch(props.url);
@@ -123,11 +143,7 @@ function Overview(props) {
 
       console.log(iconId);
 
-      if (iconId in iconData) {
-        setMainIcon(iconData[iconId]);
-      } else {
-        setMainIcon(iconData["day-bkn"]);
-      }
+      setMainIcon(iconSelect(iconId));
     } catch (error) {
       setError(error.message);
     }
@@ -158,7 +174,8 @@ function Overview(props) {
                 <i class={mainIcon}></i>
               </p>
               <p class="numerical main-num">
-                {data.properties.periods[0].temperature}°
+                {data.properties.periods[0].temperature}
+                {"°"}
                 <span class="temp-small">
                   {data.properties.periods[0].temperatureUnit}
                 </span>
@@ -413,8 +430,69 @@ function HourlyGraphs(props) {
   );
 }
 
-function WeekGraphs() {
-  return <div id="week-div"></div>;
+function WeekGraphs(props) {
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(props.url);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log(result);
+      console.log(result.properties.periods);
+      console.log(data);
+
+      setData(result.properties.periods);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 60000); // Refresh every 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [props.url]);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return (
+    <div id="week-div">
+      {data.map((item, index) =>
+        item.isDaytime ? (
+          <div key={index}>
+            <p class="week-icon">
+              <i class={iconSelect(item.icon, false)}></i>
+            </p>
+            <p>
+              <span class="day-temp numerical">
+                {item.temperature}
+                {"°"}
+                <span class="temp-small-2">{item.temperatureUnit}</span>
+              </span>{" "}
+              <br />
+              <span class="night-temp numerical">
+                {data[index + 1].temperature}
+                {"°"}
+                <span class="temp-small-3">
+                  {data[index + 1].temperatureUnit}
+                </span>
+              </span>
+            </p>
+            <p class="week-name">{item.name}</p>
+          </div>
+        ) : null
+      )}
+    </div>
+  );
 }
 
 function Radar(props) {
@@ -517,12 +595,12 @@ async function renderUserLocation() {
         <Radar station={initWeather.properties.radarStation} />
       </div>
       <div id="secondary-sections">
-        <HourlyGraphs
-          url={initWeather.properties.forecastHourly}
-          tz={initWeather.properties.timeZone}
-        />
         <WeekGraphs
           url={initWeather.properties.forecast}
+          tz={initWeather.properties.timeZone}
+        />
+        <HourlyGraphs
+          url={initWeather.properties.forecastHourly}
           tz={initWeather.properties.timeZone}
         />
       </div>

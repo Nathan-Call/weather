@@ -59,6 +59,20 @@ i {
   font-size: 30px;
   position: relative;
   left: -40px;
+  color: #ffffff80;
+}
+
+.temp-small-2 {
+  font-size: 23px;
+  position: relative;
+  left: -30px;
+  color: #ffffff80;
+}
+.temp-small-3 {
+  font-size: 14px;
+  position: relative;
+  left: -16px;
+  color: #ffffff80;
 }
 
 #overview-card {
@@ -177,6 +191,32 @@ i {
 
 #last-section {
   margin-top: 100px;
+}
+
+#week-div {
+  display: flex;
+  justify-content: space-around;
+  background-color: #293657;
+  border-radius: 25px;
+  padding: 10px;
+  margin: 0px 50px 50px 50px;
+}
+
+.week-icon {
+  font-size: 75px;
+  margin: 30px 10px 10px 10px;
+  text-align: center;
+}
+.day-temp {
+  font-size: 75px;
+}
+.night-temp {
+  font-size: 40px;
+  color: #ffffff80;
+}
+.week-name {
+  font-size: 25px;
+  font-weight: 700;
 }
 
 @media only screen and (max-width: 768px) {
