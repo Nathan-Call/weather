@@ -1,0 +1,186 @@
+html {
+  background-color: #1c253b;
+  color: white;
+}
+
+h1 {
+  font-size: 60px;
+}
+
+a {
+  color: lightblue;
+}
+
+body {
+  font-family: "Red Hat Display", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  margin: 75px;
+}
+
+.numerical {
+  font-family: "Chivo Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.numerical-normal {
+  font-family: "Chivo Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.large-icon {
+  font-size: 125px;
+  margin-block: 0px;
+}
+
+.main-num {
+  font-size: 100px;
+  margin-block: 0px;
+}
+
+.sub-num {
+  font-size: 25px;
+}
+
+.main-text {
+  font-size: 20px;
+}
+
+i {
+  margin-right: 5px;
+}
+
+.temp-small {
+  font-size: 30px;
+  position: relative;
+  left: -40px;
+}
+
+#overview-card {
+  display: flex;
+  align-items: center; /* vertically centers items */
+  background-color: #293657;
+  border: solid #293657 25px;
+  border-radius: 25px;
+}
+
+#overview-2 p {
+  margin-block: 10px;
+}
+
+#overview-2 p.city-state {
+  font-weight: 700;
+  font-size: 25px;
+  margin-bottom: 40px;
+}
+
+#main-sections {
+  display: flex;
+  justify-content: space-around;
+}
+
+#overview-div {
+  margin: 50px;
+  white-space: nowrap;
+}
+
+#radar-div {
+  margin: 50px;
+}
+
+#radar-div img {
+  background-color: #293657;
+  border: solid #293657 25px;
+  border-radius: 25px;
+}
+
+.alert-headline {
+  background-color: #8b0f0f;
+  padding: 5px;
+  border-radius: 10px;
+  user-select: none;
+  margin-bottom: 0px;
+}
+
+.alert-headline:hover,
+.alert-headline:focus {
+  cursor: pointer;
+}
+
+.alert-description {
+  background-color: #5c0a0a;
+  font-size: 14px;
+  margin-top: 0px;
+  padding: 10px;
+  border-radius: 0 0 10px 10px;
+}
+
+#zip-form {
+  display: flex;
+  flex-direction: column;
+  background-color: #293657;
+  width: max-content;
+  padding: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+#zip-form button {
+  background-color: #41568b;
+  color: white;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  font-family: "Red Hat Display", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 16px;
+  padding: 5px 10px;
+  background-color: #41568b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+#zip-form button:hover,
+#zip-form button:focus {
+  cursor: pointer;
+}
+
+#zip-form label {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+#zip-form input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100px;
+}
+
+#hourly-graph {
+  background-color: #293657;
+  border: solid #293657 25px;
+  border-radius: 25px;
+  max-width: 1000px;
+  margin-inline: auto;
+}
+
+#last-section {
+  margin-top: 100px;
+}
+
+@media only screen and (max-width: 768px) {
+  #main-sections {
+    display: block;
+  }
+}
