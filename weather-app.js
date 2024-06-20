@@ -1,10 +1,22 @@
 const { useState, useEffect, useRef } = React;
 
 function redirectToZip() {
-  var zip = document.getElementById("zipInput").value;
+  let zip = document.getElementById("zipInput").value;
+
+  let t = "f";
+  if (document.getElementById("tempF").checked) {
+    t = document.getElementById("tempF").value;
+  } else if (document.getElementById("tempC").checked) {
+    t = document.getElementById("tempC").value;
+  }
+
   if (zip.trim() !== "") {
     window.location.href =
-      window.location.pathname + "?zip=" + encodeURIComponent(zip);
+      window.location.pathname +
+      "?zip=" +
+      encodeURIComponent(zip) +
+      "&t=" +
+      encodeURIComponent(t);
   }
   return false; // Prevent form submission
 }
@@ -27,6 +39,30 @@ function Clock(props) {
       {time}
     </p>
   );
+}
+
+function tempCF(t = 0, input = "F", output = "F", returnUnit = false) {
+  if (input == output) {
+    if (returnUnit) {
+      return output.trim();
+    } else {
+      return Math.round(Number(t));
+    }
+  } else {
+    if (input == "F") {
+      if (returnUnit) {
+        return "C".trim();
+      } else {
+        return Math.round((Number(t) - 32) * (5 / 9));
+      }
+    } else {
+      if (returnUnit) {
+        return "F".trim();
+      } else {
+        return Math.round((9 / 5) * Number(t) + 32);
+      }
+    }
+  }
 }
 
 function iconSelect(iconCode, isExact = true) {
@@ -161,7 +197,6 @@ function Overview(props) {
       </div>
     );
   }
-
   //<p class="main-text">{data.properties.periods[0].name}</p>
   return (
     <div id="overview-div">
@@ -174,10 +209,20 @@ function Overview(props) {
                 <i class={mainIcon}></i>
               </p>
               <p class="numerical main-num">
-                {data.properties.periods[0].temperature}
+                {tempCF(
+                  data.properties.periods[0].temperature,
+                  data.properties.periods[0].temperatureUnit.toUpperCase(),
+                  props.t.toUpperCase(),
+                  false
+                )}
                 {"°"}
                 <span class="temp-small">
-                  {data.properties.periods[0].temperatureUnit}
+                  {tempCF(
+                    data.properties.periods[0].temperature,
+                    data.properties.periods[0].temperatureUnit.toUpperCase(),
+                    props.t.toUpperCase(),
+                    true
+                  )}
                 </span>
               </p>
             </div>
@@ -288,7 +333,6 @@ function HourlyGraphs(props) {
       //     (hour) => hour.probabilityOfPrecipitation.value
       //   )
       // ); // Precipitation chances
-
       setData(result.properties.periods.slice(0, 24));
     } catch (error) {
       setError(error.message);
@@ -335,8 +379,20 @@ function HourlyGraphs(props) {
       ),
       datasets: [
         {
-          label: "Temperature (°F)",
-          data: data.map((hour) => hour.temperature),
+          label: `Temperature (°${tempCF(
+            0,
+            data[0].temperatureUnit.toUpperCase(),
+            props.t.toUpperCase(),
+            true
+          )})`,
+          data: data.map((hour) =>
+            tempCF(
+              hour.temperature,
+              hour.temperatureUnit.toUpperCase(),
+              props.t.toUpperCase(),
+              false
+            )
+          ),
           borderColor: "#ff1a4b",
           tension: 0.1,
         },
@@ -484,16 +540,38 @@ function WeekGraphs(props) {
             </p>
             <p>
               <span class="day-temp numerical">
-                {item.temperature}
+                {tempCF(
+                  item.temperature,
+                  item.temperatureUnit.toUpperCase(),
+                  props.t.toUpperCase(),
+                  false
+                )}
                 {"°"}
-                <span class="temp-small-2">{item.temperatureUnit}</span>
+                <span class="temp-small-2">
+                  {tempCF(
+                    item.temperature,
+                    item.temperatureUnit.toUpperCase(),
+                    props.t.toUpperCase(),
+                    true
+                  )}
+                </span>
               </span>{" "}
               <br />
               <span class="night-temp numerical">
-                {data[index + 1].temperature}
+                {tempCF(
+                  data[index + 1].temperature,
+                  data[index + 1].temperatureUnit.toUpperCase(),
+                  props.t.toUpperCase(),
+                  false
+                )}
                 {"°"}
                 <span class="temp-small-3">
-                  {data[index + 1].temperatureUnit}
+                  {tempCF(
+                    data[index + 1].temperature,
+                    data[index + 1].temperatureUnit.toUpperCase(),
+                    props.t.toUpperCase(),
+                    true
+                  )}
                 </span>
               </span>
             </p>
@@ -537,8 +615,21 @@ const url = new URL(window.location.href);
 // Get the search parameters from the URL
 const params = new URLSearchParams(url.search);
 
-// Retrieve the 'id' parameter
+// Retrieve the zip parameter
 const zip = params.get("zip");
+// Retrieve the temperature unit parameter
+let t = "f";
+if (params.get("t")) {
+  t = params.get("t");
+}
+
+if (t == "c") {
+  document.getElementById("tempC").checked = true;
+  document.getElementById("tempF").checked = false;
+} else {
+  document.getElementById("tempC").checked = false;
+  document.getElementById("tempF").checked = true;
+}
 
 async function renderUserLocation() {
   const userLocation = await (
@@ -592,6 +683,7 @@ async function renderUserLocation() {
           user={userLocation}
           url={initWeather.properties.forecastHourly}
           tz={initWeather.properties.timeZone}
+          t={t}
         />
         <Radar station={initWeather.properties.radarStation} />
       </div>
@@ -599,10 +691,12 @@ async function renderUserLocation() {
         <WeekGraphs
           url={initWeather.properties.forecast}
           tz={initWeather.properties.timeZone}
+          t={t}
         />
         <HourlyGraphs
           url={initWeather.properties.forecastHourly}
           tz={initWeather.properties.timeZone}
+          t={t}
         />
       </div>
       <div id="last-section">

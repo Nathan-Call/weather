@@ -137,10 +137,9 @@ i {
 #zip-form {
   display: flex;
   flex-direction: column;
-  background-color: #293657;
   width: max-content;
-  padding: 10px;
   font-weight: 700;
+  background-color: #293657;
   border-radius: 10px;
 }
 
@@ -173,12 +172,21 @@ i {
   font-weight: bold;
 }
 
-#zip-form input {
+#zip-form input#zipInput {
   padding: 5px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
   width: 100px;
+}
+
+#form-1 {
+  padding: 5px;
+}
+
+#temp-unit {
+  text-align: center;
+  padding-left: 20px;
 }
 
 #hourly-graph {
