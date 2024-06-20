@@ -115,7 +115,6 @@ function iconSelect(iconCode, isExact = true) {
         .split("?")[0]
         .split("&")[0]
     }`;
-    console.log(iconId);
     return iconData[iconId];
   }
 }
@@ -130,18 +129,15 @@ function Overview(props) {
     try {
       const response = await fetch(props.url);
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Response Status Code: ${response.status}`);
       }
       const result = await response.json();
-      console.log(result);
       setData(result);
 
       let iconSplit = result.properties.periods[0].icon.split("/");
       let iconId = `${iconSplit[iconSplit.length - 2]}-${
         iconSplit[iconSplit.length - 1].split(",")[0]
       }`;
-
-      console.log(iconId);
 
       setMainIcon(iconSelect(iconId));
     } catch (error) {
@@ -159,7 +155,11 @@ function Overview(props) {
   }, [props.url]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div class="error-div">
+        <i class="fa-solid fa-info-circle"></i> Error (Overview): {error}
+      </div>
+    );
   }
 
   //<p class="main-text">{data.properties.periods[0].name}</p>
@@ -262,35 +262,32 @@ function HourlyGraphs(props) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
-  const [labels, setLabels] = useState(0);
-  const [temperatures, setTemperatures] = useState(0);
-  const [humidities, setHumidities] = useState(0);
-  const [precipChances, setPrecipChances] = useState(0);
+  // const [labels, setLabels] = useState(0);
+  // const [temperatures, setTemperatures] = useState(0);
+  // const [humidities, setHumidities] = useState(0);
+  // const [precipChances, setPrecipChances] = useState(0);
 
   const fetchData = async () => {
     try {
       const response = await fetch(props.url);
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Response Status Code: ${response.status}`);
       }
       const result = await response.json();
-      console.log(result);
 
-      console.log(result.properties.periods);
-      console.log(data);
       // Extracting data from data
-      setLabels(result.properties.periods.map((hour) => hour.endTime)); // Assuming 'time' is a property in your hourly data
-      setTemperatures(
-        result.properties.periods.map((hour) => hour.temperature)
-      ); // Temperatures
-      setHumidities(
-        result.properties.periods.map((hour) => hour.relativeHumidity.value)
-      ); // Humidity values
-      setPrecipChances(
-        result.properties.periods.map(
-          (hour) => hour.probabilityOfPrecipitation.value
-        )
-      ); // Precipitation chances
+      // setLabels(result.properties.periods.map((hour) => hour.endTime)); // Assuming 'time' is a property in your hourly data
+      // setTemperatures(
+      //   result.properties.periods.map((hour) => hour.temperature)
+      // ); // Temperatures
+      // setHumidities(
+      //   result.properties.periods.map((hour) => hour.relativeHumidity.value)
+      // ); // Humidity values
+      // setPrecipChances(
+      //   result.properties.periods.map(
+      //     (hour) => hour.probabilityOfPrecipitation.value
+      //   )
+      // ); // Precipitation chances
 
       setData(result.properties.periods.slice(0, 24));
     } catch (error) {
@@ -306,10 +303,6 @@ function HourlyGraphs(props) {
 
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [props.url]);
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   const chartRef = useRef(null); // Reference to the chart canvas
   const chartInstance = useRef(null); // Reference to the Chart.js instance
@@ -423,6 +416,15 @@ function HourlyGraphs(props) {
   //   { className: "hourly-div" },
   //   React.createElement(Chart.Line, { data: chartData, options: options })
   // );
+
+  if (error) {
+    return (
+      <div class="error-div">
+        <i class="fa-solid fa-info-circle"></i> Error (HourlyGraphs): {error}
+      </div>
+    );
+  }
+
   return (
     <div id="hourly-graph">
       {screen.width > 768 ? (
@@ -442,14 +444,14 @@ function WeekGraphs(props) {
     try {
       const response = await fetch(props.url);
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Response Status Code: ${response.status}`);
       }
       const result = await response.json();
-      console.log(result);
-      console.log(result.properties.periods);
-      console.log(data);
-
-      setData(result.properties.periods);
+      if (result.properties.periods[0].isDaytime) {
+        setData(result.properties.periods);
+      } else {
+        setData(result.properties.periods.slice(1, 13));
+      }
     } catch (error) {
       setError(error.message);
     }
@@ -465,7 +467,11 @@ function WeekGraphs(props) {
   }, [props.url]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div class="error-div">
+        <i class="fa-solid fa-info-circle"></i> Error (WeekGraphs): {error}
+      </div>
+    );
   }
 
   return (
@@ -573,21 +579,12 @@ async function renderUserLocation() {
     }
   });
 
-  console.log("county", countyAlerts);
-
-  // console.log("ALERTS", alerts);
-  console.log("stateAlerts", stateAlerts);
-
-  console.log("WEEK", weekForecast);
-  console.log("init", initWeather.properties);
   const hourlyForecast = await (
     await fetch(initWeather.properties.forecastHourly)
   ).json();
 
-  console.log("Hourly", hourlyForecast);
-
   ReactDOM.render(
-    <>
+    <React.StrictMode>
       <Alerts alerts={countyAlerts} />
       {/* <Clock /> */}
       <div id="main-sections">
@@ -622,7 +619,7 @@ async function renderUserLocation() {
           </a>
         </p>
       </div>
-    </>,
+    </React.StrictMode>,
 
     document.getElementById("root")
   );

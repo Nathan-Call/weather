@@ -219,6 +219,14 @@ i {
   font-weight: 700;
 }
 
+.error-div {
+  margin: 20px;
+}
+
+.error-div i {
+  color: #8b0f0f;
+}
+
 @media only screen and (max-width: 768px) {
   body {
     margin: 25px;
