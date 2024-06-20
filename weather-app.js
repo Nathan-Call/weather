@@ -252,9 +252,12 @@ function Overview(props) {
           <p>
             <span>{"Last Updated: "}</span>
             <span class="numerical-normal">
-              {new Date(data.properties.updated).toLocaleTimeString("en-US", {
-                timeZone: props.tz,
-              })}
+              {new Date(data.properties.updateTime).toLocaleTimeString(
+                "en-US",
+                {
+                  timeZone: props.tz,
+                }
+              )}
             </span>
           </p>
         </>
