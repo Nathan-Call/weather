@@ -894,6 +894,18 @@ async function renderUserLocation() {
             The National Weather Service
           </a>
         </p>
+        <p>
+          Air Quality Index data provided by{" "}
+          <a target="_blank" href="https://www.airnow.gov/">
+            AirNow
+          </a>
+        </p>
+        <p>
+          Ultra Violet Index data provided by{" "}
+          <a target="_blank" href="https://www.epa.gov/">
+            The U.S. Environmental Protection Agency
+          </a>
+        </p>
       </div>
     </React.StrictMode>,
 
