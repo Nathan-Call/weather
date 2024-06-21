@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS# DELETE IN PRODUCTION?
 import os
 import json
+import requests
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -34,6 +35,36 @@ def zip_lookup(id_value):
         return jsonify(record), 200
     else:
         return jsonify({"error": "Record not found"}), 404
+    
+
+@app.route('/air-quality-api/<id_value>', methods=['GET'])
+def air_quality_api(id_value):
+    
+    API_KEY = 'API_KEY'
+    BASE_URL = 'https://www.airnowapi.org/aq/observation/zipCode/current/'
+
+    # Prepare the request parameters
+    params = {
+        'format': 'application/json',
+        'zipCode': id_value,
+        'distance': '25',  # You can adjust the distance as needed
+        'API_KEY': API_KEY
+    }
+
+    try:
+        # Make the request to the AirNow API
+        response = requests.get(BASE_URL, params=params)
+        response.raise_for_status()  # Raise an error for bad status codes
+
+        # Parse the JSON response
+        data = response.json()
+
+        # Return the AQI data as JSON
+        return jsonify(data)
+
+    except requests.exceptions.RequestException as e:
+        # Handle any errors that occur during the request
+        return jsonify({'error': str(e)}), 500
 
 # Run the application
 if __name__ == '__main__':

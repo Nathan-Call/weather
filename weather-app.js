@@ -41,6 +41,181 @@ function Clock(props) {
   );
 }
 
+function AQIndex(props) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000/air-quality-api/${props.user.PostalCode}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Response Status Code: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      function setAQIColor(index) {
+        if (index > 300) {
+          return "#7e0023";
+        } else if (index > 200) {
+          return "#8f3f97";
+        } else if (index > 150) {
+          return "#ff0000";
+        } else if (index > 100) {
+          return "#ff7e00";
+        } else if (index > 50) {
+          return "#ffff00";
+        } else if (index >= 0) {
+          return "#00e400";
+        } else {
+          return "#ffffff";
+        }
+      }
+
+      let largestAQIObj = { AQI: 0 };
+
+      for (let x = 0; x < result.length; x++) {
+        if (result[x].AQI > largestAQIObj.AQI) {
+          largestAQIObj = result[x];
+        }
+      }
+
+      if (JSON.stringify(largestAQIObj) === JSON.stringify({ AQI: 0 })) {
+        throw new Error("Empty AQI Array");
+      }
+
+      largestAQIObj.aqiColor = setAQIColor(Number(largestAQIObj.AQI));
+      setData(largestAQIObj);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 300000); // Refresh every 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [props.url]);
+  if (error) {
+    return (
+      <span id="aqi" style={{ color: "#8b0f0f" }}>
+        <i class="fa-solid fa-info-circle"></i>
+      </span>
+    );
+  }
+
+  return (
+    <span id="aqi" class="numerical sub-num">
+      {data ? (
+        <>
+          <i
+            id="aqi-icon"
+            class="fa-solid fa-smog"
+            style={{ color: data.aqiColor }}
+          ></i>
+          {data.AQI}
+        </>
+      ) : null}
+    </span>
+  );
+}
+
+function UVIndex(props) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `https://data.epa.gov/efservice/getEnvirofactsUVHOURLY/ZIP/${props.user.PostalCode}/JSON`
+      );
+      if (!response.ok) {
+        throw new Error(`Response Status Code: ${response.status}`);
+      }
+      const result = await response.json();
+
+      function parseDateTime(dateTimeStr) {
+        return new Date(Date.parse(dateTimeStr));
+      }
+
+      let now = new Date(
+        new Date().toLocaleString("en-US", { timeZone: props.tz })
+      );
+
+      // Find the item with the closest date and time to now
+      const closestItem = result.reduce((closest, current) => {
+        const currentDateTime = parseDateTime(current.DATE_TIME);
+        const closestDateTime = parseDateTime(closest.DATE_TIME);
+        return Math.abs(currentDateTime - now) < Math.abs(closestDateTime - now)
+          ? current
+          : closest;
+      });
+
+      function setUVColor(index) {
+        if (index > 10) {
+          return "#6c49c9";
+        } else if (index > 7) {
+          return "#d90011";
+        } else if (index > 5) {
+          return "#f95901";
+        } else if (index > 2) {
+          return "#f7e401";
+        } else if (index >= 0) {
+          return "#299501";
+        } else {
+          return "#ffffff";
+        }
+      }
+
+      if (!("UV_VALUE" in closestItem)) {
+        throw new Error("UV_VALUE Error");
+      }
+
+      closestItem.uvColor = setUVColor(Number(closestItem.UV_VALUE));
+      setData(closestItem);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 300000); // Refresh every 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [props.url]);
+  if (error) {
+    return (
+      <span id="uvi" style={{ color: "#8b0f0f", marginLeft: "10px" }}>
+        <i class="fa-solid fa-info-circle"></i>
+      </span>
+    );
+  }
+
+  return (
+    <span id="uvi" class="numerical sub-num">
+      {data ? (
+        <>
+          <i
+            id="uvi-icon"
+            class="fa-solid fa-sun"
+            style={{ color: data.uvColor, marginLeft: "10px" }}
+          ></i>
+          {data.UV_VALUE}
+        </>
+      ) : null}
+    </span>
+  );
+}
+
 function tempCF(t = 0, input = "F", output = "F", returnUnit = false) {
   if (input == output) {
     if (returnUnit) {
@@ -185,7 +360,7 @@ function Overview(props) {
     fetchData();
     const interval = setInterval(() => {
       fetchData();
-    }, 60000); // Refresh every 60 seconds
+    }, 300000); // Refresh every 60 seconds
 
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [props.url]);
@@ -245,6 +420,10 @@ function Overview(props) {
                 <i class="fa-solid fa-wind"></i>
                 {data.properties.periods[0].windSpeed}{" "}
                 {data.properties.periods[0].windDirection}
+              </p>
+              <p class="numerical sub-num">
+                <AQIndex user={props.user} tz={props.tz} />
+                <UVIndex user={props.user} tz={props.tz} />
               </p>
             </div>
           </div>
@@ -346,7 +525,7 @@ function HourlyGraphs(props) {
     fetchData();
     const interval = setInterval(() => {
       fetchData();
-    }, 60000); // Refresh every 60 seconds
+    }, 300000); // Refresh every 60 seconds
 
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [props.url]);
@@ -520,7 +699,7 @@ function WeekGraphs(props) {
     fetchData();
     const interval = setInterval(() => {
       fetchData();
-    }, 60000); // Refresh every 60 seconds
+    }, 300000); // Refresh every 60 seconds
 
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [props.url]);
