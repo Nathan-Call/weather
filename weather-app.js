@@ -139,23 +139,74 @@ function UVIndex(props) {
         throw new Error(`Response Status Code: ${response.status}`);
       }
       const result = await response.json();
+      console.log(result);
 
-      function parseDateTime(dateTimeStr) {
-        return new Date(Date.parse(dateTimeStr));
+      function parseDateString(dateString) {
+        // Split the date and time parts
+        let [datePart, timePart, meridiem] = dateString.split(" ");
+
+        // Split the date part into month, day, and year
+        let [month, day, year] = datePart.split("/");
+
+        // Convert month abbreviation to a number
+        const monthAbbreviations = {
+          Jan: 0,
+          Feb: 1,
+          Mar: 2,
+          Apr: 3,
+          May: 4,
+          Jun: 5,
+          Jul: 6,
+          Aug: 7,
+          Sep: 8,
+          Oct: 9,
+          Nov: 10,
+          Dec: 11,
+        };
+
+        let monthIndex = monthAbbreviations[month];
+
+        // Split the time part into hours and minutes
+        let [hour, minute] = timePart.split(":");
+
+        // Convert hour to 24-hour format based on meridiem
+        hour = parseInt(hour, 10);
+        if (meridiem === "PM" && hour !== 12) {
+          hour += 12;
+        } else if (meridiem === "AM" && hour === 12) {
+          hour = 0;
+        }
+
+        // Create a new Date object
+        let date = new Date(
+          year,
+          monthIndex,
+          parseInt(day, 10),
+          hour,
+          minute ? parseInt(minute, 10) : 0
+        );
+
+        return date;
       }
 
       let now = new Date(
         new Date().toLocaleString("en-US", { timeZone: props.tz })
       );
 
-      // Find the item with the closest date and time to now
-      const closestItem = result.reduce((closest, current) => {
-        const currentDateTime = parseDateTime(current.DATE_TIME);
-        const closestDateTime = parseDateTime(closest.DATE_TIME);
-        return Math.abs(currentDateTime - now) < Math.abs(closestDateTime - now)
-          ? current
-          : closest;
-      });
+      let diffRef = { min: 100000000 };
+      for (let i = 0; i < result.length; i++) {
+        if (
+          Math.abs(parseDateString(result[i].DATE_TIME) - now) < diffRef.min
+        ) {
+          diffRef = {
+            min: Math.abs(parseDateString(result[i].DATE_TIME) - now),
+            idx: i,
+          };
+        }
+      }
+
+      let selectedUVI = {};
+      selectedUVI = result[diffRef.idx];
 
       function setUVColor(index) {
         if (index > 10) {
@@ -173,12 +224,12 @@ function UVIndex(props) {
         }
       }
 
-      if (!("UV_VALUE" in closestItem)) {
+      if (!("UV_VALUE" in selectedUVI)) {
         throw new Error("UV_VALUE Error");
       }
 
-      closestItem.uvColor = setUVColor(Number(closestItem.UV_VALUE));
-      setData(closestItem);
+      selectedUVI.uvColor = setUVColor(Number(selectedUVI.UV_VALUE));
+      setData(selectedUVI);
     } catch (error) {
       setError(error.message);
     }
