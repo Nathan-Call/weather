@@ -104,8 +104,8 @@ function AQIndex(props) {
   }, [props.url]);
   if (error) {
     return (
-      <span id="aqi" style={{ color: "#8b0f0f" }}>
-        <i class="fa-solid fa-info-circle"></i>
+      <span id="aqi" style={{ color: "#ffffff1a", marginRight: "10px" }}>
+        <i class="fa-solid fa-smog"></i>
       </span>
     );
   }
@@ -117,7 +117,7 @@ function AQIndex(props) {
           <i
             id="aqi-icon"
             class="fa-solid fa-smog"
-            style={{ color: data.aqiColor }}
+            style={{ color: data.aqiColor, marginRight: "10px" }}
           ></i>
           {data.AQI}
         </>
@@ -245,8 +245,8 @@ function UVIndex(props) {
   }, [props.url]);
   if (error) {
     return (
-      <span id="uvi" style={{ color: "#8b0f0f", marginLeft: "10px" }}>
-        <i class="fa-solid fa-info-circle"></i>
+      <span id="uvi" style={{ color: "#ffffff1a" }}>
+        <i class="fa-solid fa-sun"></i>
       </span>
     );
   }
@@ -258,7 +258,7 @@ function UVIndex(props) {
           <i
             id="uvi-icon"
             class="fa-solid fa-sun"
-            style={{ color: data.uvColor, marginLeft: "10px" }}
+            style={{ color: data.uvColor }}
           ></i>
           {data.UV_VALUE}
         </>
