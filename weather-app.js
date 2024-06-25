@@ -111,13 +111,13 @@ function AQIndex(props) {
   }
 
   return (
-    <span id="aqi" class="numerical sub-num">
+    <span id="aqi" class="numerical sub-num" style={{ marginRight: "10px" }}>
       {data ? (
         <>
           <i
             id="aqi-icon"
             class="fa-solid fa-smog"
-            style={{ color: data.aqiColor, marginRight: "10px" }}
+            style={{ color: data.aqiColor }}
           ></i>
           {data.AQI}
         </>
