@@ -83,6 +83,23 @@ i {
   border-radius: 25px;
 }
 
+.snowfall {
+  color: #ff3300;
+}
+
+.snowfall-num {
+  font-size: 32px;
+}
+
+.snowfall-unit {
+  font-size: 20px;
+}
+
+#radio-btn-div {
+  display: flex;
+  justify-content: space-evenly;
+}
+
 #overview-2 p {
   margin-block: 10px;
 }
@@ -186,7 +203,10 @@ i {
 
 #temp-unit {
   text-align: center;
-  padding-left: 20px;
+}
+
+#measure-unit {
+  text-align: center;
 }
 
 #hourly-graph {
@@ -233,6 +253,27 @@ i {
 
 .error-div i {
   color: #8b0f0f;
+}
+
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none; /* For Safari */
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.5s ease, border-color 0.5s ease;
+}
+
+input[type="radio"]:checked {
+  background-color: #ffffff;
+}
+
+label:hover {
+  cursor: pointer;
 }
 
 @media only screen and (max-width: 768px) {

@@ -10,13 +10,22 @@ function redirectToZip() {
     t = document.getElementById("tempC").value;
   }
 
+  let u = "in";
+  if (document.getElementById("unitIn").checked) {
+    u = document.getElementById("unitIn").value;
+  } else if (document.getElementById("unitCm").checked) {
+    u = document.getElementById("unitCm").value;
+  }
+
   if (zip.trim() !== "") {
     window.location.href =
       window.location.pathname +
       "?zip=" +
       encodeURIComponent(zip) +
       "&t=" +
-      encodeURIComponent(t);
+      encodeURIComponent(t) +
+      "&u=" +
+      encodeURIComponent(u);
   }
   return false; // Prevent form submission
 }
@@ -381,6 +390,123 @@ function iconSelect(iconCode, isExact = true) {
   }
 }
 
+function getDailySnowfallTotals(data) {
+  const dailySums = {};
+
+  data.values.forEach((entry) => {
+    const date = new Date(entry.validTime.split("T")[0])
+      .toISOString()
+      .split("T")[0]; // Extract the date
+    if (!dailySums[date]) {
+      dailySums[date] = 0;
+    }
+    dailySums[date] += entry.value; // Sum snowfall amounts for the day
+  });
+
+  return dailySums; // Return the object with dates as keys
+}
+
+function convertMm(mm, unit) {
+  if (unit === "in") {
+    return roundToFraction(parseFloat(mm / 25.4));
+  } else if (unit === "cm") {
+    return parseFloat((mm / 10).toFixed(1));
+  }
+}
+
+function roundToFraction(value) {
+  const inches = Math.floor(value); // Get the whole number part
+  const fractionalPart = value - inches;
+
+  const fractions = [
+    { value: 0, display: "" },
+    { value: 1 / 4, display: "¼" },
+    { value: 1 / 2, display: "½" },
+    { value: 3 / 4, display: "¾" },
+  ];
+
+  // Find the closest fraction
+  const closestFraction = fractions.reduce((prev, curr) =>
+    Math.abs(curr.value - fractionalPart) <
+    Math.abs(prev.value - fractionalPart)
+      ? curr
+      : prev
+  );
+
+  // Format the result
+  return `${inches > 0 ? inches : ""}${closestFraction.display}`;
+}
+
+function Snowfall(props) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [date, setDate] = useState(props.date);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setDate(props.date);
+    }, 300000);
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(props.url);
+      if (!response.ok) {
+        throw new Error(`Response Status Code: ${response.status}`);
+      }
+      const result = await response.json();
+      const snowfallResult = getDailySnowfallTotals(
+        result.properties.snowfallAmount
+      );
+
+      setData(snowfallResult);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 300000); // Refresh every 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [props.url]);
+
+  if (error) {
+    return null;
+    // return (
+    //   <div class="error-div">
+    //     <i class="fa-solid fa-info-circle"></i> Error (Overview): {error}
+    //   </div>
+    // );
+  }
+  //<p class="main-text">{data.properties.periods[0].name}</p>
+  console.log(date);
+  return (
+    <>
+      {data && date ? (
+        <>
+          {data[date] ? (
+            <>
+              {data[date] != 0 ? (
+                <div class="snowfall">
+                  <i class="fa-solid fa-snowflake"></i>
+                  <span class="snowfall-num">{convertMm(data[date], u)}</span>
+                  <span class="snowfall-unit"> {u}</span>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </>
+      ) : null}
+    </>
+  );
+}
+
 function Overview(props) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -476,8 +602,21 @@ function Overview(props) {
                 <AQIndex user={props.user} tz={props.tz} />
                 <UVIndex user={props.user} tz={props.tz} />
               </p>
+              <p class="numerical sub-num">
+                <Snowfall
+                  url={props.gridurl}
+                  tz={props.tz}
+                  date={new Date()
+                    .toLocaleDateString("en-US", { timeZone: props.tz })
+                    .split("/")
+                    .reverse()
+                    .join("-")
+                    .replace(/(\d{4})-(\d{2})-(\d{2})/, "$1-$3-$2")}
+                />
+              </p>
             </div>
           </div>
+
           <p class="main-text">{data.properties.periods[0].shortForecast}</p>
           <p>
             <span>{"Last Updated: "}</span>
@@ -762,7 +901,7 @@ function WeekGraphs(props) {
       </div>
     );
   }
-
+  console.log(data);
   return (
     <div id="week-div">
       {data.map((item, index) =>
@@ -809,6 +948,13 @@ function WeekGraphs(props) {
               </span>
             </p>
             <p class="week-name">{item.name}</p>
+            <p class="week-name numerical">
+              <Snowfall
+                url={props.gridurl}
+                tz={props.tz}
+                date={item.startTime.slice(0, 10)}
+              />
+            </p>
           </div>
         ) : null
       )}
@@ -850,6 +996,9 @@ const params = new URLSearchParams(url.search);
 
 // Retrieve the zip parameter
 const zip = params.get("zip");
+if (params.get("zip")) {
+  document.getElementById("zipInput").value = zip;
+}
 // Retrieve the temperature unit parameter
 let t = "f";
 if (params.get("t")) {
@@ -864,6 +1013,20 @@ if (t == "c") {
   document.getElementById("tempF").checked = true;
 }
 
+// Retrieve the measurement unit parameter
+let u = "in";
+if (params.get("u")) {
+  u = params.get("u");
+}
+
+if (u == "cm") {
+  document.getElementById("unitCm").checked = true;
+  document.getElementById("unitIn").checked = false;
+} else {
+  document.getElementById("unitCm").checked = false;
+  document.getElementById("unitIn").checked = true;
+}
+
 async function renderUserLocation() {
   const userLocation = await (
     await fetch(`http://127.0.0.1:5000/zip-lookup/${zip}`)
@@ -874,6 +1037,10 @@ async function renderUserLocation() {
       `https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`
     )
   ).json();
+
+  console.log(
+    `https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`
+  );
 
   const weekForecast = await (
     await fetch(initWeather.properties.forecast)
@@ -888,6 +1055,16 @@ async function renderUserLocation() {
   //     }`
   //   )
   // ).json();
+
+  const gridpoints = await (
+    await fetch(initWeather.properties.forecastGridData)
+  ).json();
+
+  const snowfall = gridpoints.properties.snowfallAmount;
+
+  console.log(snowfall);
+
+  console.log(getDailySnowfallTotals(snowfall));
 
   const stateAlerts = await (
     await fetch(
@@ -917,6 +1094,7 @@ async function renderUserLocation() {
           url={initWeather.properties.forecastHourly}
           tz={initWeather.properties.timeZone}
           t={t}
+          gridurl={initWeather.properties.forecastGridData}
         />
         <Radar station={initWeather.properties.radarStation} />
       </div>
@@ -925,6 +1103,7 @@ async function renderUserLocation() {
           url={initWeather.properties.forecast}
           tz={initWeather.properties.timeZone}
           t={t}
+          gridurl={initWeather.properties.forecastGridData}
         />
         <HourlyGraphs
           url={initWeather.properties.forecastHourly}

@@ -35,18 +35,49 @@
           <input type="text" id="zipInput" name="zip" required />
           <button type="submit">Submit</button>
         </div>
-        <div id="temp-unit">
-          <label for="tempF">°F</label>
-          <input
-            type="radio"
-            id="tempF"
-            name="temp"
-            value="f"
-            required
-            checked
-          />
-          <label for="tempC">°C</label>
-          <input type="radio" id="tempC" name="temp" value="c" required />
+        <div id="radio-btn-div">
+          <div id="measure-unit">
+            <label for="unitIn">in</label>
+            <input
+              type="radio"
+              id="unitIn"
+              name="measure"
+              value="in"
+              required
+              checked
+              onchange="return redirectToZip()"
+            />
+            <label for="unitCm">cm</label>
+            <input
+              type="radio"
+              id="unitCm"
+              name="measure"
+              value="cm"
+              required
+              onchange="return redirectToZip()"
+            />
+          </div>
+          <div id="temp-unit">
+            <label for="tempF">°F</label>
+            <input
+              type="radio"
+              id="tempF"
+              name="temp"
+              value="f"
+              required
+              checked
+              onchange="return redirectToZip()"
+            />
+            <label for="tempC">°C</label>
+            <input
+              type="radio"
+              id="tempC"
+              name="temp"
+              value="c"
+              required
+              onchange="return redirectToZip()"
+            />
+          </div>
         </div>
       </form>
     </div>
