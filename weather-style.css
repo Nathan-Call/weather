@@ -77,7 +77,7 @@ i {
 
 #overview-card {
   display: flex;
-  align-items: center; /* vertically centers items */
+  align-items: center;
   background-color: #293657;
   border: solid #293657 25px;
   border-radius: 25px;

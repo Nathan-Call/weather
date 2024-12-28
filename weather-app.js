@@ -1035,13 +1035,13 @@ async function renderUserLocation() {
     )
   ).json();
 
-  const weekForecast = await (
-    await fetch(initWeather.properties.forecast)
-  ).json();
+  // const weekForecast = await (
+  //   await fetch(initWeather.properties.forecast)
+  // ).json();
 
-  const gridpoints = await (
-    await fetch(initWeather.properties.forecastGridData)
-  ).json();
+  // const gridpoints = await (
+  //   await fetch(initWeather.properties.forecastGridData)
+  // ).json();
 
   const stateAlerts = await (
     await fetch(
