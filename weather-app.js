@@ -148,7 +148,6 @@ function UVIndex(props) {
         throw new Error(`Response Status Code: ${response.status}`);
       }
       const result = await response.json();
-      console.log(result);
 
       function parseDateString(dateString) {
         // Split the date and time parts
@@ -485,7 +484,6 @@ function Snowfall(props) {
     // );
   }
   //<p class="main-text">{data.properties.periods[0].name}</p>
-  console.log(date);
   return (
     <>
       {data && date ? (
@@ -901,7 +899,6 @@ function WeekGraphs(props) {
       </div>
     );
   }
-  console.log(data);
   return (
     <div id="week-div">
       {data.map((item, index) =>
@@ -1038,10 +1035,6 @@ async function renderUserLocation() {
     )
   ).json();
 
-  console.log(
-    `https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`
-  );
-
   const weekForecast = await (
     await fetch(initWeather.properties.forecast)
   ).json();
@@ -1059,12 +1052,6 @@ async function renderUserLocation() {
   const gridpoints = await (
     await fetch(initWeather.properties.forecastGridData)
   ).json();
-
-  const snowfall = gridpoints.properties.snowfallAmount;
-
-  console.log(snowfall);
-
-  console.log(getDailySnowfallTotals(snowfall));
 
   const stateAlerts = await (
     await fetch(
