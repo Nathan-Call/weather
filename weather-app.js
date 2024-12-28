@@ -1039,16 +1039,6 @@ async function renderUserLocation() {
     await fetch(initWeather.properties.forecast)
   ).json();
 
-  // let selectZone = initWeather.properties.forecastZone.split("/");
-
-  // const alerts = await (
-  //   await fetch(
-  //     `https://api.weather.gov/alerts/active/zone/${
-  //       selectZone[selectZone.length - 1]
-  //     }`
-  //   )
-  // ).json();
-
   const gridpoints = await (
     await fetch(initWeather.properties.forecastGridData)
   ).json();
