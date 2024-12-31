@@ -425,12 +425,17 @@ function roundToFraction(value) {
   ];
 
   // Find the closest fraction
-  const closestFraction = fractions.reduce((prev, curr) =>
+  let closestFraction = fractions.reduce((prev, curr) =>
     Math.abs(curr.value - fractionalPart) <
     Math.abs(prev.value - fractionalPart)
       ? curr
       : prev
   );
+
+  // Handle the edge case of very small values
+  if (value > 0 && value < 0.126) {
+    closestFraction = { value: 1 / 8, display: "⅛" };
+  }
 
   // Format the result
   return `${inches > 0 ? inches : ""}${closestFraction.display}`;
@@ -459,7 +464,6 @@ function Snowfall(props) {
       const snowfallResult = getDailySnowfallTotals(
         result.properties.snowfallAmount
       );
-
       setData(snowfallResult);
     } catch (error) {
       setError(error.message);
