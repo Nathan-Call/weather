@@ -1,4 +1,22 @@
-const { useState, useEffect, useRef } = React;
+const { createContext, useContext, useState, useEffect, useRef } = React;
+
+const TContext = createContext();
+
+function TProvider({ children }) {
+  const [t, setT] = useState("F");
+
+  const [u, setU] = useState("in");
+
+  return (
+    <TContext.Provider value={{ t, setT, u, setU }}>
+      {children}
+    </TContext.Provider>
+  );
+}
+
+function useT() {
+  return useContext(TContext);
+}
 
 function redirectToZip() {
   let zip = document.getElementById("zipInput").value;
@@ -28,6 +46,43 @@ function redirectToZip() {
       encodeURIComponent(u);
   }
   return false; // Prevent form submission
+}
+
+function toggleUnit() {
+  let zip = document.getElementById("zipInput").value;
+
+  let t = "f";
+  if (document.getElementById("tempF").checked) {
+    t = document.getElementById("tempF").value;
+  } else if (document.getElementById("tempC").checked) {
+    t = document.getElementById("tempC").value;
+  }
+
+  let u = "in";
+  if (document.getElementById("unitIn").checked) {
+    u = document.getElementById("unitIn").value;
+  } else if (document.getElementById("unitCm").checked) {
+    u = document.getElementById("unitCm").value;
+  }
+  console.log(t, u);
+  if (zip.trim() !== "") {
+    const newUrl =
+      window.location.pathname +
+      "?zip=" +
+      encodeURIComponent(zip) +
+      "&t=" +
+      encodeURIComponent(t) +
+      "&u=" +
+      encodeURIComponent(u);
+
+    window.history.pushState(null, "", newUrl);
+  }
+
+  const eventT = new CustomEvent("updateT", { detail: t });
+  window.dispatchEvent(eventT);
+
+  const eventU = new CustomEvent("updateU", { detail: u });
+  window.dispatchEvent(eventU);
 }
 
 function Clock(props) {
@@ -497,8 +552,10 @@ function Snowfall(props) {
               {data[date] != 0 ? (
                 <div class="snowfall">
                   <i class="fa-solid fa-snowflake"></i>
-                  <span class="snowfall-num">{convertMm(data[date], u)}</span>
-                  <span class="snowfall-unit"> {u}</span>
+                  <span class="snowfall-num">
+                    {convertMm(data[date], props.u)}
+                  </span>
+                  <span class="snowfall-unit"> {props.u}</span>
                 </div>
               ) : null}
             </>
@@ -514,6 +571,34 @@ function Overview(props) {
   const [error, setError] = useState(null);
 
   const [mainIcon, setMainIcon] = useState("fa-solid fa-cloud");
+
+  const [stateT, setStateT] = useState(props.t);
+
+  useEffect(() => {
+    const handleTUpdate = (event) => {
+      setStateT(event.detail); // Update React state when event is fired
+    };
+
+    window.addEventListener("updateT", handleTUpdate);
+
+    return () => {
+      window.removeEventListener("updateT", handleTUpdate);
+    };
+  }, []);
+
+  const [stateU, setStateU] = useState(props.u);
+
+  useEffect(() => {
+    const handleUUpdate = (event) => {
+      setStateU(event.detail); // Update React state when event is fired
+    };
+
+    window.addEventListener("updateU", handleUUpdate);
+
+    return () => {
+      window.removeEventListener("updateU", handleUUpdate);
+    };
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -566,7 +651,7 @@ function Overview(props) {
                 {tempCF(
                   data.properties.periods[0].temperature,
                   data.properties.periods[0].temperatureUnit.toUpperCase(),
-                  props.t.toUpperCase(),
+                  stateT.toUpperCase(),
                   false
                 )}
                 {"°"}
@@ -574,7 +659,7 @@ function Overview(props) {
                   {tempCF(
                     data.properties.periods[0].temperature,
                     data.properties.periods[0].temperatureUnit.toUpperCase(),
-                    props.t.toUpperCase(),
+                    stateT.toUpperCase(),
                     true
                   )}
                 </span>
@@ -608,6 +693,7 @@ function Overview(props) {
                 <Snowfall
                   url={props.gridurl}
                   tz={props.tz}
+                  u={stateU}
                   date={new Date()
                     .toLocaleDateString("en-US", { timeZone: props.tz })
                     .split("/")
@@ -686,6 +772,20 @@ function HourlyGraphs(props) {
   // const [humidities, setHumidities] = useState(0);
   // const [precipChances, setPrecipChances] = useState(0);
 
+  const [stateT, setStateT] = useState(props.t);
+
+  useEffect(() => {
+    const handleTUpdate = (event) => {
+      setStateT(event.detail); // Update React state when event is fired
+    };
+
+    window.addEventListener("updateT", handleTUpdate);
+
+    return () => {
+      window.removeEventListener("updateT", handleTUpdate);
+    };
+  }, []);
+
   const fetchData = async () => {
     try {
       const response = await fetch(props.url);
@@ -756,14 +856,14 @@ function HourlyGraphs(props) {
           label: `Temperature (°${tempCF(
             0,
             data[0].temperatureUnit.toUpperCase(),
-            props.t.toUpperCase(),
+            stateT.toUpperCase(),
             true
           )})`,
           data: data.map((hour) =>
             tempCF(
               hour.temperature,
               hour.temperatureUnit.toUpperCase(),
-              props.t.toUpperCase(),
+              stateT.toUpperCase(),
               false
             )
           ),
@@ -839,7 +939,7 @@ function HourlyGraphs(props) {
     return () => {
       destroyChart();
     };
-  }, [data]); // Re-render chart when data changes
+  }, [data, stateT]); // Re-render chart when data changes
 
   // return React.createElement(
   //   "div",
@@ -869,6 +969,34 @@ function HourlyGraphs(props) {
 function WeekGraphs(props) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+
+  const [stateT, setStateT] = useState(props.t);
+
+  useEffect(() => {
+    const handleTUpdate = (event) => {
+      setStateT(event.detail); // Update React state when event is fired
+    };
+
+    window.addEventListener("updateT", handleTUpdate);
+
+    return () => {
+      window.removeEventListener("updateT", handleTUpdate);
+    };
+  }, []);
+
+  const [stateU, setStateU] = useState(props.u);
+
+  useEffect(() => {
+    const handleUUpdate = (event) => {
+      setStateU(event.detail); // Update React state when event is fired
+    };
+
+    window.addEventListener("updateU", handleUUpdate);
+
+    return () => {
+      window.removeEventListener("updateU", handleUUpdate);
+    };
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -916,7 +1044,7 @@ function WeekGraphs(props) {
                 {tempCF(
                   item.temperature,
                   item.temperatureUnit.toUpperCase(),
-                  props.t.toUpperCase(),
+                  stateT.toUpperCase(),
                   false
                 )}
                 {"°"}
@@ -924,7 +1052,7 @@ function WeekGraphs(props) {
                   {tempCF(
                     item.temperature,
                     item.temperatureUnit.toUpperCase(),
-                    props.t.toUpperCase(),
+                    stateT.toUpperCase(),
                     true
                   )}
                 </span>
@@ -934,7 +1062,7 @@ function WeekGraphs(props) {
                 {tempCF(
                   data[index + 1].temperature,
                   data[index + 1].temperatureUnit.toUpperCase(),
-                  props.t.toUpperCase(),
+                  stateT.toUpperCase(),
                   false
                 )}
                 {"°"}
@@ -942,7 +1070,7 @@ function WeekGraphs(props) {
                   {tempCF(
                     data[index + 1].temperature,
                     data[index + 1].temperatureUnit.toUpperCase(),
-                    props.t.toUpperCase(),
+                    stateT.toUpperCase(),
                     true
                   )}
                 </span>
@@ -953,6 +1081,7 @@ function WeekGraphs(props) {
               <Snowfall
                 url={props.gridurl}
                 tz={props.tz}
+                u={stateU}
                 date={item.startTime.slice(0, 10)}
               />
             </p>
@@ -1029,6 +1158,20 @@ if (u == "cm") {
 }
 
 async function renderUserLocation() {
+  ReactDOM.render(
+    <div id="loading">
+      {!new URLSearchParams(window.location.search).has("zip") ? (
+        <>
+          <i class="fa fa-arrow-up" aria-hidden="true"></i>
+          <span>Please enter your ZIP code.</span>
+        </>
+      ) : (
+        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+      )}
+    </div>,
+    document.getElementById("root")
+  );
+
   const userLocation = await (
     await fetch(`http://127.0.0.1:5000/zip-lookup/${zip}`)
   ).json();
@@ -1067,57 +1210,61 @@ async function renderUserLocation() {
 
   ReactDOM.render(
     <React.StrictMode>
-      <Alerts alerts={countyAlerts} />
-      {/* <Clock /> */}
-      <div id="main-sections">
-        <Overview
-          user={userLocation}
-          url={initWeather.properties.forecastHourly}
-          tz={initWeather.properties.timeZone}
-          t={t}
-          gridurl={initWeather.properties.forecastGridData}
-        />
-        <Radar station={initWeather.properties.radarStation} />
-      </div>
-      <div id="secondary-sections">
-        <WeekGraphs
-          url={initWeather.properties.forecast}
-          tz={initWeather.properties.timeZone}
-          t={t}
-          gridurl={initWeather.properties.forecastGridData}
-        />
-        <HourlyGraphs
-          url={initWeather.properties.forecastHourly}
-          tz={initWeather.properties.timeZone}
-          t={t}
-        />
-      </div>
-      <div id="last-section">
-        <p>
-          ZIP code interpolation data provided by{" "}
-          <a target="_blank" href="https://www.geonames.org/">
-            GeoNames
-          </a>
-        </p>
-        <p>
-          Weather data provided by{" "}
-          <a target="_blank" href="https://www.weather.gov/">
-            The National Weather Service
-          </a>
-        </p>
-        <p>
-          Air Quality Index data provided by{" "}
-          <a target="_blank" href="https://www.airnow.gov/">
-            AirNow
-          </a>
-        </p>
-        <p>
-          Ultra Violet Index data provided by{" "}
-          <a target="_blank" href="https://www.epa.gov/">
-            The U.S. Environmental Protection Agency
-          </a>
-        </p>
-      </div>
+      <TProvider>
+        <Alerts alerts={countyAlerts} />
+        {/* <Clock /> */}
+        <div id="main-sections">
+          <Overview
+            user={userLocation}
+            url={initWeather.properties.forecastHourly}
+            tz={initWeather.properties.timeZone}
+            t={t}
+            u={u}
+            gridurl={initWeather.properties.forecastGridData}
+          />
+          <Radar station={initWeather.properties.radarStation} />
+        </div>
+        <div id="secondary-sections">
+          <WeekGraphs
+            url={initWeather.properties.forecast}
+            tz={initWeather.properties.timeZone}
+            t={t}
+            u={u}
+            gridurl={initWeather.properties.forecastGridData}
+          />
+          <HourlyGraphs
+            url={initWeather.properties.forecastHourly}
+            tz={initWeather.properties.timeZone}
+            t={t}
+          />
+        </div>
+        <div id="last-section">
+          <p>
+            ZIP code interpolation data provided by{" "}
+            <a target="_blank" href="https://www.geonames.org/">
+              GeoNames
+            </a>
+          </p>
+          <p>
+            Weather data provided by{" "}
+            <a target="_blank" href="https://www.weather.gov/">
+              The National Weather Service
+            </a>
+          </p>
+          <p>
+            Air Quality Index data provided by{" "}
+            <a target="_blank" href="https://www.airnow.gov/">
+              AirNow
+            </a>
+          </p>
+          <p>
+            Ultra Violet Index data provided by{" "}
+            <a target="_blank" href="https://www.epa.gov/">
+              The U.S. Environmental Protection Agency
+            </a>
+          </p>
+        </div>
+      </TProvider>
     </React.StrictMode>,
 
     document.getElementById("root")
