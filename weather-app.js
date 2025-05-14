@@ -18,8 +18,11 @@ function useT() {
   return useContext(TContext);
 }
 
-function redirectToZip() {
+function redirectToZip(z = "") {
   let zip = document.getElementById("zipInput").value;
+  if (z != "") {
+    zip = z;
+  }
 
   let t = "f";
   if (document.getElementById("tempF").checked) {
@@ -48,8 +51,11 @@ function redirectToZip() {
   return false; // Prevent form submission
 }
 
-function toggleUnit() {
+function toggleUnit(z = "") {
   let zip = document.getElementById("zipInput").value;
+  if (z != "") {
+    zip = z;
+  }
 
   let t = "f";
   if (document.getElementById("tempF").checked) {
@@ -704,19 +710,20 @@ function Overview(props) {
               </p>
             </div>
           </div>
-
-          <p class="main-text">{data.properties.periods[0].shortForecast}</p>
-          <p>
-            <span>{"Last Updated: "}</span>
-            <span class="numerical-normal">
-              {new Date(data.properties.updateTime).toLocaleTimeString(
-                "en-US",
-                {
-                  timeZone: props.tz,
-                }
-              )}
-            </span>
-          </p>
+          <div id="overview-sub-div">
+            <p class="main-text">{data.properties.periods[0].shortForecast}</p>
+            <p>
+              <span>{"Last Updated: "}</span>
+              <span class="numerical-normal">
+                {new Date(data.properties.updateTime).toLocaleTimeString(
+                  "en-US",
+                  {
+                    timeZone: props.tz,
+                  }
+                )}
+              </span>
+            </p>
+          </div>
         </>
       ) : (
         <span>Loading...</span>
@@ -759,6 +766,185 @@ function Alerts(props) {
           </p>
         </div>
       ))}
+    </div>
+  );
+}
+
+function City(props) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const [mainIcon, setMainIcon] = useState("fa-solid fa-cloud");
+
+  const [stateT, setStateT] = useState(props.t);
+
+  useEffect(() => {
+    const handleTUpdate = (event) => {
+      setStateT(event.detail); // Update React state when event is fired
+    };
+
+    window.addEventListener("updateT", handleTUpdate);
+
+    return () => {
+      window.removeEventListener("updateT", handleTUpdate);
+    };
+  }, []);
+
+  // const [stateU, setStateU] = useState(props.u);
+
+  // useEffect(() => {
+  //   const handleUUpdate = (event) => {
+  //     setStateU(event.detail); // Update React state when event is fired
+  //   };
+
+  //   window.addEventListener("updateU", handleUUpdate);
+
+  //   return () => {
+  //     window.removeEventListener("updateU", handleUUpdate);
+  //   };
+  // }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(props.url);
+      if (!response.ok) {
+        throw new Error(`Response Status Code: ${response.status}`);
+      }
+      const result = await response.json();
+      setData(result);
+
+      let iconSplit = result.properties.periods[0].icon.split("/");
+      let iconId = `${iconSplit[iconSplit.length - 2]}-${
+        iconSplit[iconSplit.length - 1].split(",")[0]
+      }`;
+
+      setMainIcon(iconSelect(iconId));
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 300000); // Refresh every 60 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [props.url]);
+
+  if (error) {
+    return (
+      <div class="error-div">
+        <i class="fa-solid fa-info-circle"></i> Error (Overview): {error}
+      </div>
+    );
+  }
+  //<p class="main-text">{data.properties.periods[0].name}</p>
+  return (
+    <>
+      {data ? (
+        <>
+          <div class="city-card" onClick={() => redirectToZip(props.zip)}>
+            <div class="city-sec-1">
+              <p class="numerical city-icon">
+                <i class={mainIcon}></i>
+              </p>
+              <p class="numerical city-num">
+                {tempCF(
+                  data.properties.periods[0].temperature,
+                  data.properties.periods[0].temperatureUnit.toUpperCase(),
+                  stateT.toUpperCase(),
+                  false
+                )}
+                {"°"}
+                <span class="city-temp-small">
+                  {tempCF(
+                    data.properties.periods[0].temperature,
+                    data.properties.periods[0].temperatureUnit.toUpperCase(),
+                    stateT.toUpperCase(),
+                    true
+                  )}
+                </span>
+              </p>
+            </div>
+
+            <div class="city-sec-2">
+              <Clock tz={props.tz} />
+              <p class="city-state">
+                {props.city}
+                {", "}
+                {props.stateCode}
+              </p>
+            </div>
+          </div>
+        </>
+      ) : (
+        <span>Loading...</span>
+      )}
+    </>
+  );
+}
+
+function Cities(props) {
+  return (
+    <div id="cities-div">
+      <City
+        url="https://api.weather.gov/gridpoints/MTR/85,105/forecast/hourly"
+        tz={"America/Los_Angeles"}
+        city={"San Francisco"}
+        stateCode={"CA"}
+        t={props.t}
+        zip={"94102"}
+      />
+      <City
+        url="https://api.weather.gov/gridpoints/OKX/33,35/forecast/hourly"
+        tz={"America/New_York"}
+        city={"New York"}
+        stateCode={"NY"}
+        t={props.t}
+        zip={"10038"}
+      />
+      <City
+        url="https://api.weather.gov/gridpoints/LOT/75,73/forecast/hourly"
+        tz={"America/Chicago"}
+        city={"Chicago"}
+        stateCode={"IL"}
+        t={props.t}
+        zip={"60606"}
+      />
+      <City
+        url="https://api.weather.gov/gridpoints/EWX/156,91/forecast/hourly"
+        tz={"America/Chicago"}
+        city={"Austin"}
+        stateCode={"TX"}
+        t={props.t}
+        zip={"78701"}
+      />
+      <City
+        url="https://api.weather.gov/gridpoints/MFL/110,50/forecast/hourly"
+        tz={"America/New_York"}
+        city={"Miami"}
+        stateCode={"FL"}
+        t={props.t}
+        zip={"33130"}
+      />
+      <City
+        url="https://api.weather.gov/gridpoints/BOU/63,62/forecast/hourly"
+        tz={"America/Denver"}
+        city={"Denver"}
+        stateCode={"CO"}
+        t={props.t}
+        zip={"80202"}
+      />
+      <City
+        url="https://api.weather.gov/gridpoints/SEW/124,68/forecast/hourly"
+        tz={"America/Los_Angeles"}
+        city={"Seattle"}
+        stateCode={"WA"}
+        t={props.t}
+        zip={"98104"}
+      />
     </div>
   );
 }
@@ -1172,10 +1358,18 @@ async function renderUserLocation() {
     document.getElementById("root")
   );
 
+  if (!new URLSearchParams(window.location.search).has("zip")) {
+    const ipZip = await (await fetch("https://ipapi.co/postal/")).json();
+    console.log(ipZip);
+    if (/^\d{5}/.test(ipZip.toString())) {
+      redirectToZip(ipZip.toString());
+    }
+  }
+
   const userLocation = await (
     await fetch(`http://127.0.0.1:5000/zip-lookup/${zip}`)
   ).json();
-
+  console.log(userLocation.Latitude, userLocation.Longitude);
   const initWeather = await (
     await fetch(
       `https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`
@@ -1211,6 +1405,7 @@ async function renderUserLocation() {
   ReactDOM.render(
     <React.StrictMode>
       <TProvider>
+        <Cities t={t} />
         <Alerts alerts={countyAlerts} />
         {/* <Clock /> */}
         <div id="main-sections">
@@ -1261,6 +1456,12 @@ async function renderUserLocation() {
             Ultra Violet Index data provided by{" "}
             <a target="_blank" href="https://www.epa.gov/">
               The U.S. Environmental Protection Agency
+            </a>
+          </p>
+          <p>
+            Default location data provided by{" "}
+            <a target="_blank" href="https://ipapi.co/">
+              IPAPI
             </a>
           </p>
         </div>

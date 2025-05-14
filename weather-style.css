@@ -127,6 +127,20 @@ i {
   white-space: nowrap;
 }
 
+#overview-sub-div {
+  white-space: wrap;
+  padding: 5px;
+  background-color: #29365780;
+  width: max-content;
+  max-width: 500px;
+  margin-top: 10px;
+  border-radius: 20px;
+}
+
+#overview-sub-div p {
+  margin: 10px;
+}
+
 #radar-div {
   margin: 50px;
 }
@@ -165,6 +179,9 @@ i {
   font-weight: 700;
   background-color: #293657;
   border-radius: 10px;
+  position: absolute;
+  right: 100px;
+  top: 15px;
 }
 
 #zip-form button {
@@ -299,6 +316,65 @@ label:hover {
   margin-left: 10px;
 }
 
+.city-card {
+  display: flex;
+  align-items: center;
+  background-color: #293657;
+  padding: 5px 10px 5px 10px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.city-card:hover,
+.city-card:focus {
+  cursor: pointer;
+  background-color: #33446d;
+  transition: 0.3s;
+}
+
+.city-sec-1 {
+  margin-right: 0px;
+}
+.city-sec-2 {
+  margin-left: 0px;
+}
+
+.city-sec-2 p {
+  margin-block: 10px;
+}
+
+.city-sec-2 p.city-state,
+.city-sec-2 p.sub-num {
+  font-weight: 700;
+  font-size: 16px;
+  margin-block: 2px;
+}
+
+#cities-div {
+  white-space: nowrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 5px;
+  margin-block: 15px;
+}
+
+.city-icon {
+  font-size: 25px;
+  margin-block: 0px;
+}
+
+.city-num {
+  font-size: 20px;
+  margin-block: 0px;
+}
+
+.city-temp-small {
+  font-size: 8px;
+  position: relative;
+  left: -8px;
+  color: #ffffff80;
+}
+
 @media only screen and (max-width: 768px) {
   body {
     margin: 25px;
@@ -324,6 +400,10 @@ label:hover {
   }
 
   #overview-2 p.city-state {
+    font-size: 20px;
+  }
+
+  .city-sec-2 p.city-state {
     font-size: 20px;
   }
 
@@ -367,8 +447,20 @@ label:hover {
     width: calc(100% - 50px);
   }
 
+  #cities-div {
+    width: 100%;
+  }
+
+  .city-card {
+    width: calc(100% - 50px);
+  }
+
   #hourly-graph {
     margin-inline: 0px;
     width: calc(100% - 25px);
+  }
+
+  #zip-form {
+    right: 25px;
   }
 }
