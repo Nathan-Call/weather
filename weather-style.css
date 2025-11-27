@@ -151,6 +151,35 @@ i {
   border-radius: 25px;
 }
 
+#radar-buttons button {
+  background-color: #41568b;
+  color: white;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  font-family: "Red Hat Display", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 16px;
+  padding: 5px 10px;
+  background-color: #41568b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-inline: 3px;
+}
+#radar-buttons button:hover,
+#radar-buttons button:focus {
+  cursor: pointer;
+}
+
+#radar-buttons button:disabled {
+  background-color: #293657;
+}
+
 .alert-headline {
   background-color: #8b0f0f;
   padding: 5px;
@@ -300,20 +329,28 @@ label:hover {
   cursor: pointer;
 }
 
-#loading {
+.loading {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-#loading i {
+.loading i {
   font-size: 100px;
 }
 
-#loading span {
+.loading span,
+.loading-2 span {
   font-size: 35px;
-  margin-left: 10px;
+  width: max-content;
+}
+
+.loading-2 span {
+  position: fixed;
+  margin-top: 100px;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .city-card {

@@ -7,11 +7,7 @@ function TProvider({ children }) {
 
   const [u, setU] = useState("in");
 
-  return (
-    <TContext.Provider value={{ t, setT, u, setU }}>
-      {children}
-    </TContext.Provider>
-  );
+  return <TContext.Provider value={{ t, setT, u, setU }}>{children}</TContext.Provider>;
 }
 
 function useT() {
@@ -92,9 +88,7 @@ function toggleUnit(z = "") {
 }
 
 function Clock(props) {
-  const [time, setTime] = useState(
-    new Date().toLocaleTimeString("en-US", { timeZone: props.tz })
-  );
+  const [time, setTime] = useState(new Date().toLocaleTimeString("en-US", { timeZone: props.tz }));
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -117,9 +111,7 @@ function AQIndex(props) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:5000/air-quality-api/${props.user.PostalCode}`
-      );
+      const response = await fetch(`http://127.0.0.1:5000/air-quality-api/${props.user.PostalCode}`);
 
       if (!response.ok) {
         throw new Error(`Response Status Code: ${response.status}`);
@@ -184,11 +176,7 @@ function AQIndex(props) {
     <span id="aqi" class="numerical sub-num" style={{ marginRight: "10px" }}>
       {data ? (
         <>
-          <i
-            id="aqi-icon"
-            class="fa-solid fa-smog"
-            style={{ color: data.aqiColor }}
-          ></i>
+          <i id="aqi-icon" class="fa-solid fa-smog" style={{ color: data.aqiColor }}></i>
           {data.AQI}
         </>
       ) : null}
@@ -247,26 +235,16 @@ function UVIndex(props) {
         }
 
         // Create a new Date object
-        let date = new Date(
-          year,
-          monthIndex,
-          parseInt(day, 10),
-          hour,
-          minute ? parseInt(minute, 10) : 0
-        );
+        let date = new Date(year, monthIndex, parseInt(day, 10), hour, minute ? parseInt(minute, 10) : 0);
 
         return date;
       }
 
-      let now = new Date(
-        new Date().toLocaleString("en-US", { timeZone: props.tz })
-      );
+      let now = new Date(new Date().toLocaleString("en-US", { timeZone: props.tz }));
 
       let diffRef = { min: 100000000 };
       for (let i = 0; i < result.length; i++) {
-        if (
-          Math.abs(parseDateString(result[i].DATE_TIME) - now) < diffRef.min
-        ) {
+        if (Math.abs(parseDateString(result[i].DATE_TIME) - now) < diffRef.min) {
           diffRef = {
             min: Math.abs(parseDateString(result[i].DATE_TIME) - now),
             idx: i,
@@ -324,11 +302,7 @@ function UVIndex(props) {
     <span id="uvi" class="numerical sub-num">
       {data ? (
         <>
-          <i
-            id="uvi-icon"
-            class="fa-solid fa-sun"
-            style={{ color: data.uvColor }}
-          ></i>
+          <i id="uvi-icon" class="fa-solid fa-sun" style={{ color: data.uvColor }}></i>
           {data.UV_VALUE}
         </>
       ) : null}
@@ -441,10 +415,7 @@ function iconSelect(iconCode, isExact = true) {
   } else {
     let iconSplit = iconCode.split("/");
     let iconId = `${iconSplit[iconSplit.indexOf("day")]}-${
-      iconSplit[iconSplit.indexOf("day") + 1]
-        .split(",")[0]
-        .split("?")[0]
-        .split("&")[0]
+      iconSplit[iconSplit.indexOf("day") + 1].split(",")[0].split("?")[0].split("&")[0]
     }`;
     return iconData[iconId];
   }
@@ -454,9 +425,7 @@ function getDailySnowfallTotals(data) {
   const dailySums = {};
 
   data.values.forEach((entry) => {
-    const date = new Date(entry.validTime.split("T")[0])
-      .toISOString()
-      .split("T")[0]; // Extract the date
+    const date = new Date(entry.validTime.split("T")[0]).toISOString().split("T")[0]; // Extract the date
     if (!dailySums[date]) {
       dailySums[date] = 0;
     }
@@ -487,10 +456,7 @@ function roundToFraction(value) {
 
   // Find the closest fraction
   let closestFraction = fractions.reduce((prev, curr) =>
-    Math.abs(curr.value - fractionalPart) <
-    Math.abs(prev.value - fractionalPart)
-      ? curr
-      : prev
+    Math.abs(curr.value - fractionalPart) < Math.abs(prev.value - fractionalPart) ? curr : prev
   );
 
   // Handle the edge case of very small values
@@ -522,9 +488,7 @@ function Snowfall(props) {
         throw new Error(`Response Status Code: ${response.status}`);
       }
       const result = await response.json();
-      const snowfallResult = getDailySnowfallTotals(
-        result.properties.snowfallAmount
-      );
+      const snowfallResult = getDailySnowfallTotals(result.properties.snowfallAmount);
       setData(snowfallResult);
     } catch (error) {
       setError(error.message);
@@ -558,9 +522,7 @@ function Snowfall(props) {
               {data[date] != 0 ? (
                 <div class="snowfall">
                   <i class="fa-solid fa-snowflake"></i>
-                  <span class="snowfall-num">
-                    {convertMm(data[date], props.u)}
-                  </span>
+                  <span class="snowfall-num">{convertMm(data[date], props.u)}</span>
                   <span class="snowfall-unit"> {props.u}</span>
                 </div>
               ) : null}
@@ -616,9 +578,7 @@ function Overview(props) {
       setData(result);
 
       let iconSplit = result.properties.periods[0].icon.split("/");
-      let iconId = `${iconSplit[iconSplit.length - 2]}-${
-        iconSplit[iconSplit.length - 1].split(",")[0]
-      }`;
+      let iconId = `${iconSplit[iconSplit.length - 2]}-${iconSplit[iconSplit.length - 1].split(",")[0]}`;
 
       setMainIcon(iconSelect(iconId));
     } catch (error) {
@@ -681,15 +641,12 @@ function Overview(props) {
               </p>
               <p class="numerical sub-num">
                 <i class="fa-solid fa-droplet"></i>
-                {
-                  data.properties.periods[0].probabilityOfPrecipitation.value
-                }% <i class="fa-solid fa-water"></i>
+                {data.properties.periods[0].probabilityOfPrecipitation.value}% <i class="fa-solid fa-water"></i>
                 {data.properties.periods[0].relativeHumidity.value}%
               </p>
               <p class="numerical sub-num">
                 <i class="fa-solid fa-wind"></i>
-                {data.properties.periods[0].windSpeed}{" "}
-                {data.properties.periods[0].windDirection}
+                {data.properties.periods[0].windSpeed} {data.properties.periods[0].windDirection}
               </p>
               <p class="numerical sub-num">
                 <AQIndex user={props.user} tz={props.tz} />
@@ -715,12 +672,9 @@ function Overview(props) {
             <p>
               <span>{"Last Updated: "}</span>
               <span class="numerical-normal">
-                {new Date(data.properties.updateTime).toLocaleTimeString(
-                  "en-US",
-                  {
-                    timeZone: props.tz,
-                  }
-                )}
+                {new Date(data.properties.updateTime).toLocaleTimeString("en-US", {
+                  timeZone: props.tz,
+                })}
               </span>
             </p>
           </div>
@@ -735,12 +689,10 @@ function Overview(props) {
 function toggleElement(id) {
   if (document.getElementById(id).style.display == "none") {
     document.getElementById(id).style.display = "block";
-    document.getElementById(`headline-${id}`).style.borderRadius =
-      "10px 10px 0 0";
+    document.getElementById(`headline-${id}`).style.borderRadius = "10px 10px 0 0";
   } else {
     document.getElementById(id).style.display = "none";
-    document.getElementById(`headline-${id}`).style.borderRadius =
-      "10px 10px 10px 10px";
+    document.getElementById(`headline-${id}`).style.borderRadius = "10px 10px 10px 10px";
   }
 }
 
@@ -749,19 +701,11 @@ function Alerts(props) {
     <div id="alerts-div">
       {props.alerts.map((item, index) => (
         <div key={index}>
-          <h3
-            id={"headline-alert-" + index}
-            class="alert-headline"
-            onClick={() => toggleElement("alert-" + index)}
-          >
+          <h3 id={"headline-alert-" + index} class="alert-headline" onClick={() => toggleElement("alert-" + index)}>
             <i class="fa-solid fa-triangle-exclamation"></i>
             {item.properties.headline}
           </h3>
-          <p
-            id={"alert-" + index}
-            class="alert-description"
-            style={{ display: "none" }}
-          >
+          <p id={"alert-" + index} class="alert-description" style={{ display: "none" }}>
             {item.properties.description}
           </p>
         </div>
@@ -814,9 +758,7 @@ function City(props) {
       setData(result);
 
       let iconSplit = result.properties.periods[0].icon.split("/");
-      let iconId = `${iconSplit[iconSplit.length - 2]}-${
-        iconSplit[iconSplit.length - 1].split(",")[0]
-      }`;
+      let iconId = `${iconSplit[iconSplit.length - 2]}-${iconSplit[iconSplit.length - 1].split(",")[0]}`;
 
       setMainIcon(iconSelect(iconId));
     } catch (error) {
@@ -1039,19 +981,9 @@ function HourlyGraphs(props) {
       ),
       datasets: [
         {
-          label: `Temperature (°${tempCF(
-            0,
-            data[0].temperatureUnit.toUpperCase(),
-            stateT.toUpperCase(),
-            true
-          )})`,
+          label: `Temperature (°${tempCF(0, data[0].temperatureUnit.toUpperCase(), stateT.toUpperCase(), true)})`,
           data: data.map((hour) =>
-            tempCF(
-              hour.temperature,
-              hour.temperatureUnit.toUpperCase(),
-              stateT.toUpperCase(),
-              false
-            )
+            tempCF(hour.temperature, hour.temperatureUnit.toUpperCase(), stateT.toUpperCase(), false)
           ),
           borderColor: "#ff1a4b",
           tension: 0.1,
@@ -1227,20 +1159,10 @@ function WeekGraphs(props) {
             </p>
             <p>
               <span class="day-temp numerical">
-                {tempCF(
-                  item.temperature,
-                  item.temperatureUnit.toUpperCase(),
-                  stateT.toUpperCase(),
-                  false
-                )}
+                {tempCF(item.temperature, item.temperatureUnit.toUpperCase(), stateT.toUpperCase(), false)}
                 {"°"}
                 <span class="temp-small-2">
-                  {tempCF(
-                    item.temperature,
-                    item.temperatureUnit.toUpperCase(),
-                    stateT.toUpperCase(),
-                    true
-                  )}
+                  {tempCF(item.temperature, item.temperatureUnit.toUpperCase(), stateT.toUpperCase(), true)}
                 </span>
               </span>{" "}
               <br />
@@ -1264,12 +1186,7 @@ function WeekGraphs(props) {
             </p>
             <p class="week-name">{item.name}</p>
             <p class="week-name numerical">
-              <Snowfall
-                url={props.gridurl}
-                tz={props.tz}
-                u={stateU}
-                date={item.startTime.slice(0, 10)}
-              />
+              <Snowfall url={props.gridurl} tz={props.tz} u={stateU} date={item.startTime.slice(0, 10)} />
             </p>
           </div>
         ) : null
@@ -1279,29 +1196,74 @@ function WeekGraphs(props) {
 }
 
 function Radar(props) {
-  const [srcUrl, setSrcUrl] = useState(
-    `https://radar.weather.gov/ridge/standard/${props.station}_loop.gif`
-  );
+  const [viewType, setViewType] = useState("radar"); // "radar" or "satellite"
+  const [srcUrl, setSrcUrl] = useState("");
+  const [radarMargin, setRadarMargin] = useState("75px");
 
   useEffect(() => {
     const updateImageUrl = () => {
       const timestamp = new Date().getTime();
-      setSrcUrl(
-        `https://radar.weather.gov/ridge/standard/${props.station}_loop.gif?timestamp=${timestamp}`
-      );
+
+      if (viewType === "radar") {
+        // radar per-station animated GIF [web:29]
+        setSrcUrl(`https://radar.weather.gov/ridge/standard/${props.station}_loop.gif?timestamp=${timestamp}`);
+        setRadarMargin("50px");
+      } else {
+        // GOES-19 UMV GeoColor 600x600 GIF [web:12][web:28]
+        setSrcUrl(
+          `https://cdn.star.nesdis.noaa.gov/${props.region.satelliteID.toUpperCase()}/ABI/SECTOR/${props.region.regionCode.toLowerCase()}/GEOCOLOR/${props.region.satelliteID.toUpperCase()}-${props.region.regionCode.toUpperCase()}-GEOCOLOR-600x600.gif?timestamp=${timestamp}`
+        );
+        setRadarMargin("25px");
+      }
     };
 
-    updateImageUrl(); // Update the URL immediately
-    const interval = setInterval(updateImageUrl, 60000); // Update the URL every minute
+    updateImageUrl(); // set immediately
+    const interval = setInterval(updateImageUrl, 60000); // refresh every minute
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, [props.station]);
+    return () => clearInterval(interval);
+  }, [props.station, viewType]); // rerun when station or view changes
 
   return (
-    <div id="radar-div">
-      <img src={srcUrl} alt="Weather radar" />
+    <div
+      id="radar-div"
+      style={{
+        marginBottom: radarMargin,
+        marginTop: radarMargin,
+      }}
+    >
+      <img src={srcUrl} alt={viewType === "radar" ? "Weather radar" : "Satellite imagery"} />
+      <div id="radar-buttons">
+        <button onClick={() => setViewType("radar")} disabled={viewType === "radar"}>
+          Radar
+        </button>
+        <button onClick={() => setViewType("satellite")} disabled={viewType === "satellite"}>
+          Satellite
+        </button>
+      </div>
     </div>
   );
+}
+
+function BackgroundRefresher(props) {
+  useEffect(() => {
+    const setBackground = () => {
+      const ts = new Date().getTime();
+      const url = `https://cdn.star.nesdis.noaa.gov/${props.region.satelliteID.toUpperCase()}/ABI/SECTOR/${props.region.regionCode.toUpperCase()}/GEOCOLOR/2400x2400.jpg?timestamp=${ts}`;
+
+      document.documentElement.style.background = `linear-gradient(#1c253bbb, #1c253bbb), url("${url}"), #1c253b`;
+      document.documentElement.style.backgroundSize = "cover";
+      // document.documentElement.style.backgroundSize = "110%";
+      document.documentElement.style.backgroundAttachment = "fixed";
+      document.documentElement.style.backgroundPosition = "center";
+    };
+
+    setBackground();
+    const id = setInterval(setBackground, 10 * 60 * 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
+  return null;
 }
 
 // Get the full URL
@@ -1343,20 +1305,68 @@ if (u == "cm") {
   document.getElementById("unitIn").checked = true;
 }
 
-async function renderUserLocation() {
-  ReactDOM.render(
-    <div id="loading">
+function LoadingIconCycler() {
+  const [iconIndex, setIconIndex] = useState(0);
+
+  const icons = [
+    "fa-cloud",
+    "fa-cloud-rain",
+    "fa-cloud-showers-heavy",
+    "fa-cloud-bolt",
+    "fa-cloud-sun",
+    "fa-sun",
+    "fa-smog",
+    "fa-snowflake",
+    "fa-wind",
+    "fa-hurricane",
+  ];
+
+  const loadingPhrases = [
+    "Checking the skies...",
+    "Watching the clouds roll by...",
+    "Listening for raindrops...",
+    "Calibrating sunshine levels...",
+    "Updating your sky report...",
+    "Downloading cloud data...",
+    "Cloud syncing in progress...",
+    "Contacting the cloud servers...",
+    "Spinning up the forecast engine...",
+    "Pinging weather satellites...",
+  ];
+
+  const [loadingPhrasePick] = useState(() => loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIconIndex((prev) => (prev + 1) % icons.length);
+    }, 1000); // every 2 seconds
+
+    return () => clearInterval(interval); // cleanup on unmount
+  }, []);
+
+  return (
+    <>
       {!new URLSearchParams(window.location.search).has("zip") ? (
-        <>
+        <div class="loading">
           <i class="fa fa-arrow-up" aria-hidden="true"></i>
           <span>Please enter your ZIP code.</span>
-        </>
+        </div>
       ) : (
-        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+        <>
+          <div class="loading">
+            <i style={{}} className={`fa ${icons[iconIndex]} fa-fade`} aria-hidden="true"></i>
+          </div>
+          <div class="loading-2">
+            <span style={{ position: "absolute", top: "60%" }}>{loadingPhrasePick}</span>
+          </div>
+        </>
       )}
-    </div>,
-    document.getElementById("root")
+    </>
   );
+}
+
+async function renderUserLocation() {
+  ReactDOM.render(<LoadingIconCycler />, document.getElementById("root"));
 
   if (!new URLSearchParams(window.location.search).has("zip")) {
     const ipZip = await (await fetch("https://ipapi.co/postal/")).json();
@@ -1366,14 +1376,10 @@ async function renderUserLocation() {
     }
   }
 
-  const userLocation = await (
-    await fetch(`http://127.0.0.1:5000/zip-lookup/${zip}`)
-  ).json();
+  const userLocation = await (await fetch(`http://127.0.0.1:5000/zip-lookup/${zip}`)).json();
   console.log(userLocation.Latitude, userLocation.Longitude);
   const initWeather = await (
-    await fetch(
-      `https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`
-    )
+    await fetch(`https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`)
   ).json();
 
   // const weekForecast = await (
@@ -1385,9 +1391,7 @@ async function renderUserLocation() {
   // ).json();
 
   const stateAlerts = await (
-    await fetch(
-      `https://api.weather.gov/alerts/active/area/${userLocation.StateCode}`
-    )
+    await fetch(`https://api.weather.gov/alerts/active/area/${userLocation.StateCode}`)
   ).json();
 
   let countyAlerts = [];
@@ -1398,78 +1402,137 @@ async function renderUserLocation() {
     }
   });
 
-  const hourlyForecast = await (
-    await fetch(initWeather.properties.forecastHourly)
-  ).json();
+  const hourlyForecast = await (await fetch(initWeather.properties.forecastHourly)).json();
 
-  ReactDOM.render(
-    <React.StrictMode>
-      <TProvider>
-        <Cities t={t} />
-        <Alerts alerts={countyAlerts} />
-        {/* <Clock /> */}
-        <div id="main-sections">
-          <Overview
-            user={userLocation}
-            url={initWeather.properties.forecastHourly}
-            tz={initWeather.properties.timeZone}
-            t={t}
-            u={u}
-            gridurl={initWeather.properties.forecastGridData}
-          />
-          <Radar station={initWeather.properties.radarStation} />
-        </div>
-        <div id="secondary-sections">
-          <WeekGraphs
-            url={initWeather.properties.forecast}
-            tz={initWeather.properties.timeZone}
-            t={t}
-            u={u}
-            gridurl={initWeather.properties.forecastGridData}
-          />
-          <HourlyGraphs
-            url={initWeather.properties.forecastHourly}
-            tz={initWeather.properties.timeZone}
-            t={t}
-          />
-        </div>
-        <div id="last-section">
-          <p>
-            ZIP code interpolation data provided by{" "}
-            <a target="_blank" href="https://www.geonames.org/">
-              GeoNames
-            </a>
-          </p>
-          <p>
-            Weather data provided by{" "}
-            <a target="_blank" href="https://www.weather.gov/">
-              The National Weather Service
-            </a>
-          </p>
-          <p>
-            Air Quality Index data provided by{" "}
-            <a target="_blank" href="https://www.airnow.gov/">
-              AirNow
-            </a>
-          </p>
-          <p>
-            Ultra Violet Index data provided by{" "}
-            <a target="_blank" href="https://www.epa.gov/">
-              The U.S. Environmental Protection Agency
-            </a>
-          </p>
-          <p>
-            Default location data provided by{" "}
-            <a target="_blank" href="https://ipapi.co/">
-              IPAPI
-            </a>
-          </p>
-        </div>
-      </TProvider>
-    </React.StrictMode>,
+  console.log(userLocation.StateCode);
 
-    document.getElementById("root")
-  );
+  const statesToNOAARegion = {
+    AL: { regionCode: "smv", satelliteID: "GOES19" },
+    AK: { regionCode: "cak", satelliteID: "GOES18" },
+    AZ: { regionCode: "sr", satelliteID: "GOES19" },
+    AR: { regionCode: "smv", satelliteID: "GOES19" },
+    CA: { regionCode: "psw", satelliteID: "GOES18" },
+    CO: { regionCode: "nr", satelliteID: "GOES19" },
+    CT: { regionCode: "ne", satelliteID: "GOES19" },
+    DC: { regionCode: "ne", satelliteID: "GOES19" },
+    DE: { regionCode: "ne", satelliteID: "GOES19" },
+    FL: { regionCode: "se", satelliteID: "GOES19" },
+    GA: { regionCode: "se", satelliteID: "GOES19" },
+    HI: { regionCode: "hi", satelliteID: "GOES18" },
+    ID: { regionCode: "pnw", satelliteID: "GOES18" },
+    IL: { regionCode: "umv", satelliteID: "GOES19" },
+    IN: { regionCode: "cgl", satelliteID: "GOES19" },
+    IA: { regionCode: "umv", satelliteID: "GOES19" },
+    KS: { regionCode: "nr", satelliteID: "GOES19" },
+    KY: { regionCode: "cgl", satelliteID: "GOES19" },
+    LA: { regionCode: "smv", satelliteID: "GOES19" },
+    ME: { regionCode: "ne", satelliteID: "GOES19" },
+    MD: { regionCode: "ne", satelliteID: "GOES19" },
+    MA: { regionCode: "ne", satelliteID: "GOES19" },
+    MI: { regionCode: "cgl", satelliteID: "GOES19" },
+    MN: { regionCode: "umv", satelliteID: "GOES19" },
+    MS: { regionCode: "smv", satelliteID: "GOES19" },
+    MO: { regionCode: "umv", satelliteID: "GOES19" },
+    MT: { regionCode: "nr", satelliteID: "GOES19" },
+    NE: { regionCode: "nr", satelliteID: "GOES19" },
+    NV: { regionCode: "psw", satelliteID: "GOES18" },
+    NH: { regionCode: "ne", satelliteID: "GOES19" },
+    NJ: { regionCode: "ne", satelliteID: "GOES19" },
+    NM: { regionCode: "sr", satelliteID: "GOES19" },
+    NY: { regionCode: "ne", satelliteID: "GOES19" },
+    NC: { regionCode: "se", satelliteID: "GOES19" },
+    ND: { regionCode: "umv", satelliteID: "GOES19" },
+    OH: { regionCode: "cgl", satelliteID: "GOES19" },
+    OK: { regionCode: "sp", satelliteID: "GOES19" },
+    OR: { regionCode: "pnw", satelliteID: "GOES18" },
+    PA: { regionCode: "ne", satelliteID: "GOES19" },
+    RI: { regionCode: "ne", satelliteID: "GOES19" },
+    SC: { regionCode: "se", satelliteID: "GOES19" },
+    SD: { regionCode: "umv", satelliteID: "GOES19" },
+    TN: { regionCode: "cgl", satelliteID: "GOES19" },
+    TX: { regionCode: "sp", satelliteID: "GOES19" },
+    UT: { regionCode: "sr", satelliteID: "GOES19" },
+    VT: { regionCode: "ne", satelliteID: "GOES19" },
+    VA: { regionCode: "cgl", satelliteID: "GOES19" },
+    WA: { regionCode: "pnw", satelliteID: "GOES18" },
+    WV: { regionCode: "cgl", satelliteID: "GOES19" },
+    WI: { regionCode: "umv", satelliteID: "GOES19" },
+    WY: { regionCode: "nr", satelliteID: "GOES19" },
+  };
+
+  setTimeout(() => {
+    ReactDOM.render(
+      <React.StrictMode>
+        <TProvider>
+          <Cities t={t} />
+          <Alerts alerts={countyAlerts} />
+          {/* <Clock /> */}
+          <div id="main-sections">
+            <Overview
+              user={userLocation}
+              url={initWeather.properties.forecastHourly}
+              tz={initWeather.properties.timeZone}
+              t={t}
+              u={u}
+              gridurl={initWeather.properties.forecastGridData}
+            />
+            <Radar station={initWeather.properties.radarStation} region={statesToNOAARegion[userLocation.StateCode]} />
+          </div>
+          <div id="secondary-sections">
+            <WeekGraphs
+              url={initWeather.properties.forecast}
+              tz={initWeather.properties.timeZone}
+              t={t}
+              u={u}
+              gridurl={initWeather.properties.forecastGridData}
+            />
+            <HourlyGraphs url={initWeather.properties.forecastHourly} tz={initWeather.properties.timeZone} t={t} />
+          </div>
+          <div id="last-section">
+            <p>
+              ZIP code interpolation data provided by{" "}
+              <a target="_blank" href="https://www.geonames.org/">
+                GeoNames
+              </a>
+            </p>
+            <p>
+              Weather data provided by{" "}
+              <a target="_blank" href="https://www.weather.gov/">
+                The National Weather Service
+              </a>
+            </p>
+            <p>
+              Air Quality Index data provided by{" "}
+              <a target="_blank" href="https://www.airnow.gov/">
+                AirNow
+              </a>
+            </p>
+            <p>
+              Ultra Violet Index data provided by{" "}
+              <a target="_blank" href="https://www.epa.gov/">
+                The U.S. Environmental Protection Agency
+              </a>
+            </p>
+            <p>
+              Default location data provided by{" "}
+              <a target="_blank" href="https://ipapi.co/">
+                IPAPI
+              </a>
+            </p>
+            <p>
+              Satellite data provided by{" "}
+              <a target="_blank" href="https://www.star.nesdis.noaa.gov/GOES/index.php">
+                The National Oceanic and Atmospheric Administration
+              </a>
+            </p>
+          </div>
+          <BackgroundRefresher region={statesToNOAARegion[userLocation.StateCode]} />
+        </TProvider>
+      </React.StrictMode>,
+
+      document.getElementById("root")
+    );
+  }, 1000);
 }
 
 renderUserLocation();
