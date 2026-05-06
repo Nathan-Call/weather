@@ -1,0 +1,68 @@
+:root {
+  --white: #ffffff;
+  --white-trans: #ffffff80;
+  --lighter-white: #dedede;
+  --light-white: #cccccc;
+  --lighter-gray: #adadad;
+  --light-gray: #777;
+  --gray: #404040;
+  --dark-gray: #262626;
+  --black: #000000;
+  --black-trans: #000000bf;
+  --light-blue: #4fb4ce;
+  --blue-green: #4089ae;
+  --cyan: #008080;
+  --light-cyan: #4ed5e4;
+  --cyan-trans: #00808050;
+  --dark-cyan: #2e535c;
+  --x-dark-cyan: #101d20;
+  --gray-blue: #435760;
+  --gcp-yellow: #f8bc0f;
+  --gcp-red: #eb4131;
+  --gcp-blue: #0075bd;
+  --firebase-orange: #f29e13;
+
+  --main-width: 960px;
+  --h1-font-size: 40px;
+  --h2-font-size: 32px;
+  --h3-font-size: 24px;
+  --main-font-size: 18px;
+  --small-font-size: 15px;
+}
+
+#navbar-template {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding: 25px;
+  background-color: var(--dark-cyan);
+  border-radius: 0px 0px 25px 0px;
+}
+
+.navdiv-template {
+  text-decoration: none;
+}
+
+.navdiv-template a {
+  color: var(--white);
+  text-decoration: none;
+  border: solid var(--dark-cyan);
+  padding: 5px;
+  border-radius: 7px;
+}
+.navdiv-template i {
+  padding-right: 5px;
+}
+
+.navdiv-template a:hover {
+  border: solid var(--white);
+  cursor: pointer;
+}
+
+#last-section a {
+  color: lightblue;
+}
+
+#last-section {
+  margin-top: 200px;
+}
