@@ -840,7 +840,7 @@ function Cities(props) {
         zip={"94102"}
       />
       <City
-        url="https://api.weather.gov/gridpoints/OKX/33,35/forecast/hourly"
+        url="https://api.weather.gov/gridpoints/OKX/33,42/forecast/hourly"
         tz={"America/New_York"}
         city={"New York"}
         stateCode={"NY"}
