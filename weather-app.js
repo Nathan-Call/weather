@@ -111,7 +111,7 @@ function AQIndex(props) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/air-quality-api/${props.user.PostalCode}`);
+      const response = await fetch(`https://nathancall.tech/air-quality-api/${props.user.PostalCode}`);
 
       if (!response.ok) {
         throw new Error(`Response Status Code: ${response.status}`);
@@ -191,7 +191,7 @@ function UVIndex(props) {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `https://data.epa.gov/efservice/getEnvirofactsUVHOURLY/ZIP/${props.user.PostalCode}/JSON`
+        `https://data.epa.gov/efservice/getEnvirofactsUVHOURLY/ZIP/${props.user.PostalCode}/JSON`,
       );
       if (!response.ok) {
         throw new Error(`Response Status Code: ${response.status}`);
@@ -456,7 +456,7 @@ function roundToFraction(value) {
 
   // Find the closest fraction
   let closestFraction = fractions.reduce((prev, curr) =>
-    Math.abs(curr.value - fractionalPart) < Math.abs(prev.value - fractionalPart) ? curr : prev
+    Math.abs(curr.value - fractionalPart) < Math.abs(prev.value - fractionalPart) ? curr : prev,
   );
 
   // Handle the edge case of very small values
@@ -618,7 +618,7 @@ function Overview(props) {
                   data.properties.periods[0].temperature,
                   data.properties.periods[0].temperatureUnit.toUpperCase(),
                   stateT.toUpperCase(),
-                  false
+                  false,
                 )}
                 {"°"}
                 <span class="temp-small">
@@ -626,7 +626,7 @@ function Overview(props) {
                     data.properties.periods[0].temperature,
                     data.properties.periods[0].temperatureUnit.toUpperCase(),
                     stateT.toUpperCase(),
-                    true
+                    true,
                   )}
                 </span>
               </p>
@@ -797,7 +797,7 @@ function City(props) {
                   data.properties.periods[0].temperature,
                   data.properties.periods[0].temperatureUnit.toUpperCase(),
                   stateT.toUpperCase(),
-                  false
+                  false,
                 )}
                 {"°"}
                 <span class="city-temp-small">
@@ -805,7 +805,7 @@ function City(props) {
                     data.properties.periods[0].temperature,
                     data.properties.periods[0].temperatureUnit.toUpperCase(),
                     stateT.toUpperCase(),
-                    true
+                    true,
                   )}
                 </span>
               </p>
@@ -977,13 +977,13 @@ function HourlyGraphs(props) {
           hour: "numeric",
           minute: "numeric",
           timeZone: props.tz,
-        }).format(new Date(hour.endTime))
+        }).format(new Date(hour.endTime)),
       ),
       datasets: [
         {
           label: `Temperature (°${tempCF(0, data[0].temperatureUnit.toUpperCase(), stateT.toUpperCase(), true)})`,
           data: data.map((hour) =>
-            tempCF(hour.temperature, hour.temperatureUnit.toUpperCase(), stateT.toUpperCase(), false)
+            tempCF(hour.temperature, hour.temperatureUnit.toUpperCase(), stateT.toUpperCase(), false),
           ),
           borderColor: "#ff1a4b",
           tension: 0.1,
@@ -1171,7 +1171,7 @@ function WeekGraphs(props) {
                   data[index + 1].temperature,
                   data[index + 1].temperatureUnit.toUpperCase(),
                   stateT.toUpperCase(),
-                  false
+                  false,
                 )}
                 {"°"}
                 <span class="temp-small-3">
@@ -1179,7 +1179,7 @@ function WeekGraphs(props) {
                     data[index + 1].temperature,
                     data[index + 1].temperatureUnit.toUpperCase(),
                     stateT.toUpperCase(),
-                    true
+                    true,
                   )}
                 </span>
               </span>
@@ -1189,7 +1189,7 @@ function WeekGraphs(props) {
               <Snowfall url={props.gridurl} tz={props.tz} u={stateU} date={item.startTime.slice(0, 10)} />
             </p>
           </div>
-        ) : null
+        ) : null,
       )}
     </div>
   );
@@ -1211,7 +1211,7 @@ function Radar(props) {
       } else {
         // GOES-19 UMV GeoColor 600x600 GIF [web:12][web:28]
         setSrcUrl(
-          `https://cdn.star.nesdis.noaa.gov/${props.region.satelliteID.toUpperCase()}/ABI/SECTOR/${props.region.regionCode.toLowerCase()}/GEOCOLOR/${props.region.satelliteID.toUpperCase()}-${props.region.regionCode.toUpperCase()}-GEOCOLOR-600x600.gif?timestamp=${timestamp}`
+          `https://cdn.star.nesdis.noaa.gov/${props.region.satelliteID.toUpperCase()}/ABI/SECTOR/${props.region.regionCode.toLowerCase()}/GEOCOLOR/${props.region.satelliteID.toUpperCase()}-${props.region.regionCode.toUpperCase()}-GEOCOLOR-600x600.gif?timestamp=${timestamp}`,
         );
         setRadarMargin("25px");
       }
@@ -1376,7 +1376,7 @@ async function renderUserLocation() {
     }
   }
 
-  const userLocation = await (await fetch(`http://127.0.0.1:5000/zip-lookup/${zip}`)).json();
+  const userLocation = await (await fetch(`https://nathancall.tech/zip-lookup/${zip}`)).json();
   console.log(userLocation.Latitude, userLocation.Longitude);
   const initWeather = await (
     await fetch(`https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`)
@@ -1490,6 +1490,12 @@ async function renderUserLocation() {
           </div>
           <div id="last-section">
             <p>
+              Check out the full project source code on{" "}
+              <a target="_blank" href="https://github.com/Nathan-Call/weather">
+                GitHub
+              </a>
+            </p>
+            <p>
               ZIP code interpolation data provided by{" "}
               <a target="_blank" href="https://www.geonames.org/">
                 GeoNames
@@ -1530,7 +1536,7 @@ async function renderUserLocation() {
         </TProvider>
       </React.StrictMode>,
 
-      document.getElementById("root")
+      document.getElementById("root"),
     );
   }, 1000);
 }

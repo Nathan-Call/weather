@@ -3,12 +3,16 @@
   "name": "weather",
   "compatibility_date": "2026-05-06",
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "assets": {
-    "directory": "."
+    "directory": ".",
   },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    {
+      "pattern": "weather.nathancall.tech",
+      "custom_domain": true,
+    },
+  ],
 }
