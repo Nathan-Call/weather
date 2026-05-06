@@ -111,7 +111,7 @@ function AQIndex(props) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`https://nathancall.tech/air-quality-api/${props.user.PostalCode}`);
+      const response = await fetch(`./air-quality-api/${props.user.PostalCode}`);
 
       if (!response.ok) {
         throw new Error(`Response Status Code: ${response.status}`);
@@ -1376,7 +1376,7 @@ async function renderUserLocation() {
     }
   }
 
-  const userLocation = await (await fetch(`https://nathancall.tech/zip-lookup/${zip}`)).json();
+  const userLocation = await (await fetch(`./zip-lookup/${zip}`)).json();
   console.log(userLocation.Latitude, userLocation.Longitude);
   const initWeather = await (
     await fetch(`https://api.weather.gov/points/${userLocation.Latitude},${userLocation.Longitude}`)
