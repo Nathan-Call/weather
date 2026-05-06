@@ -15,4 +15,5 @@
       "custom_domain": true,
     },
   ],
+  "main": "worker.js",
 }
